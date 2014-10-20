@@ -67,7 +67,9 @@ public class NewApplet extends javax.swing.JApplet {
         jTextField1 = new javax.swing.JTextField();
         jMenuBar1 = new javax.swing.JMenuBar();
         File = new javax.swing.JMenu();
-        jMenu2 = new javax.swing.JMenu();
+        Open = new javax.swing.JMenuItem();
+        Save = new javax.swing.JMenu();
+        Edit = new javax.swing.JMenu();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -75,7 +77,7 @@ public class NewApplet extends javax.swing.JApplet {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 528, Short.MAX_VALUE)
+            .addGap(0, 559, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -113,14 +115,21 @@ public class NewApplet extends javax.swing.JApplet {
                 .addComponent(jRadioButton1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(364, Short.MAX_VALUE))
+                .addContainerGap(409, Short.MAX_VALUE))
         );
 
         File.setText("File");
+
+        Open.setText("Open");
+        File.add(Open);
+
+        Save.setText("Save");
+        File.add(Save);
+
         jMenuBar1.add(File);
 
-        jMenu2.setText("Edit");
-        jMenuBar1.add(jMenu2);
+        Edit.setText("Edit");
+        jMenuBar1.add(Edit);
 
         setJMenuBar(jMenuBar1);
 
@@ -146,8 +155,10 @@ public class NewApplet extends javax.swing.JApplet {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenu Edit;
     private javax.swing.JMenu File;
-    private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenuItem Open;
+    private javax.swing.JMenu Save;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
