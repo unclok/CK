@@ -4,17 +4,27 @@
  * and open the template in the editor.
  */
 package YoungDoubleSlit;
-
+import java.applet.*;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.awt.Graphics;
+import java.awt.Color;
+//import javax.swing.*;
 /**
  *
  * @author Geonmo
  */
 public class YoungDoubleSlit extends javax.swing.JApplet {
-
+    int wavelength, slit_width, slit_distance;   
+    
+    
+    
     /**
      * Initializes the applet YoungDoubleSlit
      */
+
     @Override
+    
     public void init() {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -38,19 +48,74 @@ public class YoungDoubleSlit extends javax.swing.JApplet {
             java.util.logging.Logger.getLogger(YoungDoubleSlit.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-        
+        wavelength =0;
+        slit_width = 0;
+        slit_distance= 0;        
         /* Create and display the applet */
         try {
             java.awt.EventQueue.invokeAndWait(new Runnable() {
                 public void run() {
                     initComponents();
-                }
+                    System.out.println("Start Timer!!");
+                    javax.swing.Timer timer = new javax.swing.Timer(100,new aListener());
+                    timer.start();
+                }                
             });
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+        //timer.setRepeats(True);
+        
+        //javax.swing.Timer timer = new javax.swing.Timer(1000, this);        
     }
-
+    
+    public void stop()
+    {
+        
+    }
+    public class aListener implements ActionListener 
+    {
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("On Timer!!");
+                upperView.repaint();
+                resultView.repaint();
+            }
+    };
+    
+    public class UpperViewPane extends javax.swing.JPanel{                
+        private int radius;
+        UpperViewPane(){
+            super();
+            radius = 0 ;
+        }
+        public void paintComponent(Graphics g)
+        {   
+            final int STEP = 5;
+            super.paintComponent(g);
+            g.setColor(Color.blue);
+            radius = radius+STEP;
+            g.drawOval(100-radius/2,125-radius/2,radius,radius);
+            System.out.format("%d %d\n",radius, wavelength);            
+        }
+    }
+    public class ResultViewPane extends javax.swing.JPanel{
+        private int radius;
+        ResultViewPane(){
+            super();
+            radius = 0;
+        }
+        public void paintComponent(Graphics g)
+        {
+            /**
+            final int STEP = 5;
+            super.paintComponent(g);
+            g.setColor(Color.blue);
+            radius = radius+STEP;
+            g.drawOval(100-radius/2,125-radius/2,radius,radius);
+            System.out.format("%d %d\n",radius, wavelength);
+            */
+        }
+    }
     /**
      * This method is called from within the init() method to initialize the
      * form. WARNING: Do NOT modify this code. The content of this method is
@@ -64,7 +129,6 @@ public class YoungDoubleSlit extends javax.swing.JApplet {
         theButtonGroup = new javax.swing.ButtonGroup();
         jFileChooser1 = new javax.swing.JFileChooser();
         jInternalFrame1 = new javax.swing.JInternalFrame();
-        UpperView = new javax.swing.JScrollPane();
         jPanel1 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         theTargetDistance = new javax.swing.JSpinner();
@@ -82,7 +146,8 @@ public class YoungDoubleSlit extends javax.swing.JApplet {
         theRadioButton3 = new javax.swing.JRadioButton();
         theSingleSlitWidth = new javax.swing.JSpinner();
         theWaveLengthSlider = new javax.swing.JSlider();
-        ResultView = new javax.swing.JScrollPane();
+        upperView = new UpperViewPane();
+        resultView = new ResultViewPane();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
@@ -155,6 +220,17 @@ public class YoungDoubleSlit extends javax.swing.JApplet {
         org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, theWaveLength, org.jdesktop.beansbinding.ELProperty.create("${value}"), theWaveLengthSlider, org.jdesktop.beansbinding.BeanProperty.create("value"));
         bindingGroup.addBinding(binding);
 
+        theWaveLengthSlider.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                theWaveLengthSliderStateChanged(evt);
+            }
+        });
+        theWaveLengthSlider.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                theWaveLengthSliderPropertyChange(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -217,7 +293,7 @@ public class YoungDoubleSlit extends javax.swing.JApplet {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
-                    .addComponent(theWaveLength, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(theWaveLength, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(theWaveLengthSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(1, 1, 1)
@@ -239,6 +315,32 @@ public class YoungDoubleSlit extends javax.swing.JApplet {
                 .addContainerGap())
         );
 
+        upperView.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+
+        javax.swing.GroupLayout upperViewLayout = new javax.swing.GroupLayout(upperView);
+        upperView.setLayout(upperViewLayout);
+        upperViewLayout.setHorizontalGroup(
+            upperViewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 562, Short.MAX_VALUE)
+        );
+        upperViewLayout.setVerticalGroup(
+            upperViewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+
+        resultView.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+
+        javax.swing.GroupLayout resultViewLayout = new javax.swing.GroupLayout(resultView);
+        resultView.setLayout(resultViewLayout);
+        resultViewLayout.setHorizontalGroup(
+            resultViewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        resultViewLayout.setVerticalGroup(
+            resultViewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 256, Short.MAX_VALUE)
+        );
+
         jMenu1.setText("File");
         jMenuBar1.add(jMenu1);
 
@@ -253,23 +355,21 @@ public class YoungDoubleSlit extends javax.swing.JApplet {
             jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jInternalFrame1Layout.createSequentialGroup()
                 .addGroup(jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(UpperView, javax.swing.GroupLayout.DEFAULT_SIZE, 566, Short.MAX_VALUE)
-                    .addComponent(ResultView))
+                    .addComponent(upperView, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(resultView, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jInternalFrame1Layout.setVerticalGroup(
             jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jInternalFrame1Layout.createSequentialGroup()
-                .addGroup(jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jInternalFrame1Layout.createSequentialGroup()
-                        .addComponent(UpperView)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(ResultView, javax.swing.GroupLayout.PREFERRED_SIZE, 276, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jInternalFrame1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap()
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
+            .addGroup(jInternalFrame1Layout.createSequentialGroup()
+                .addComponent(upperView, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(resultView, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -311,10 +411,24 @@ public class YoungDoubleSlit extends javax.swing.JApplet {
         // TODO add your handling code here:
     }//GEN-LAST:event_theRadioButton3ActionPerformed
 
+    private void theWaveLengthSliderPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_theWaveLengthSliderPropertyChange
+        // TODO add your handling code here:
+        System.out.println("Found PropertyChanged.");
+        String property = evt.getPropertyName();
+       if ( "value".equals(property)) {
+           wavelength = (int) evt.getNewValue();
+       }
+    }//GEN-LAST:event_theWaveLengthSliderPropertyChange
+
+    private void theWaveLengthSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_theWaveLengthSliderStateChanged
+        // TODO add your handling code here:
+        //System.out.println("Found state changed!");
+        //System.out.println("Source : "+evt.getSource());
+        wavelength = (int) theWaveLength.getValue();
+    }//GEN-LAST:event_theWaveLengthSliderStateChanged
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JScrollPane ResultView;
-    private javax.swing.JScrollPane UpperView;
     private javax.swing.JButton jButton1;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JCheckBox jCheckBox2;
@@ -328,6 +442,7 @@ public class YoungDoubleSlit extends javax.swing.JApplet {
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel resultView;
     private javax.swing.ButtonGroup theButtonGroup;
     private javax.swing.JSpinner theDistanceSlits;
     private javax.swing.JButton theEndButton;
@@ -338,6 +453,7 @@ public class YoungDoubleSlit extends javax.swing.JApplet {
     private javax.swing.JSpinner theTargetDistance;
     private javax.swing.JSpinner theWaveLength;
     private javax.swing.JSlider theWaveLengthSlider;
+    private javax.swing.JPanel upperView;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 }
