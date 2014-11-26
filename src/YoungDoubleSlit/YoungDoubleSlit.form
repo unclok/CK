@@ -148,19 +148,18 @@
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                           </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="theWaveLengthSlider" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                          </Group>
                       </Group>
-                  </Group>
-                  <Group type="102" alignment="1" attributes="0">
-                      <EmptySpace max="32767" attributes="0"/>
-                      <Component id="theWaveLengthSlider" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="1" attributes="0">
-                      <EmptySpace pref="106" max="32767" attributes="0"/>
+                      <EmptySpace pref="20" max="32767" attributes="0"/>
                       <Component id="theRadioButton3" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
@@ -232,6 +231,9 @@
               </Properties>
             </Component>
             <Component class="javax.swing.JSpinner" name="theWaveLength">
+              <BindingProperties>
+                <BindingProperty name="value" source="theWaveLengthSlider" sourcePath="${value}" target="theWaveLength" targetPath="value" updateStrategy="0" immediately="false"/>
+              </BindingProperties>
             </Component>
             <Component class="javax.swing.JRadioButton" name="theRadioButton1">
               <Properties>
@@ -296,11 +298,6 @@
                 <Property name="maximum" type="int" value="800"/>
                 <Property name="minimum" type="int" value="300"/>
               </Properties>
-              <BindingProperties>
-                <BindingProperty name="value" source="theWaveLength" sourcePath="${value}" target="theWaveLengthSlider" targetPath="value" updateStrategy="0" immediately="false">
-                  <BindingParameter name="IGNORE_ADJUSTING" value="N"/>
-                </BindingProperty>
-              </BindingProperties>
               <Events>
                 <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="theWaveLengthSliderStateChanged"/>
                 <EventHandler event="propertyChange" listener="java.beans.PropertyChangeListener" parameters="java.beans.PropertyChangeEvent" handler="theWaveLengthSliderPropertyChange"/>
@@ -328,7 +325,7 @@
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="255" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
           </Layout>
