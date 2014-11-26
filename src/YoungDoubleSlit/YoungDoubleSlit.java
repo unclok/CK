@@ -325,7 +325,7 @@ public class YoungDoubleSlit extends javax.swing.JApplet {
         );
         upperViewLayout.setVerticalGroup(
             upperViewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGap(0, 255, Short.MAX_VALUE)
         );
 
         resultView.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
