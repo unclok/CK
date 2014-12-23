@@ -7,6 +7,7 @@ package VectorDivergenceCurl;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import VectorDivergenceCurl.draw3d;
 
 /**
  *
@@ -63,11 +64,11 @@ public class VectorDivergenceCurl extends javax.swing.JApplet {
         }
         public void paintComponent(Graphics g)
         {   
-            //final int STEP = 100;
+            final int STEP = 100;
             super.paintComponent(g);
             g.setColor(Color.blue);
             radius = radius+STEP;
-            g.drawOval(50,75,100,100);  
+            draw3d.
             System.out.format("out");
         }
     }
