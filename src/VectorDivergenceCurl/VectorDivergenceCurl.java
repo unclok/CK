@@ -4,17 +4,28 @@
  * and open the template in the editor.
  */
 package VectorDivergenceCurl;
-
-import java.awt.Color;
+import VectorDivergenceCurl.Vec3DemoFrame;
+import VectorDivergenceCurl.VectorDivergenceCurl;
 import java.awt.Graphics;
-import VectorDivergenceCurl.draw3d;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import javax.swing.JApplet;
 
 /**
  *
- * @author Kijin
+ * @author 기진
  */
-public class VectorDivergenceCurl extends javax.swing.JApplet {
+public class VectorDivergenceCurl extends javax.swing.JApplet implements ComponentListener {
 
+    static Vec3DemoFrame ogf;
+
+    void destroyFrame() {
+	if (ogf != null)
+	    ogf.dispose();
+	ogf = null;
+	repaint();
+    }
+    boolean started = false;
     /**
      * Initializes the applet VectorDivergenceCurl
      */
@@ -25,6 +36,7 @@ public class VectorDivergenceCurl extends javax.swing.JApplet {
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
          */
+        
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -48,29 +60,55 @@ public class VectorDivergenceCurl extends javax.swing.JApplet {
             java.awt.EventQueue.invokeAndWait(new Runnable() {
                 public void run() {
                     initComponents();
+                    ogf = (Vec3DemoFrame)ogfl;
+                    ogf.setVisible(true);
+                   //cv = (Vec3DemoCanvas)jPanel1;
                 }
             });
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        
-    
+        ogf.addComponentListener(this);
     }
- public class UpperViewPane extends javax.swing.JPanel{                
-        private int radius;
-        UpperViewPane(){
-            super();
-            radius = 0 ;
-        }
-        public void paintComponent(Graphics g)
-        {   
-            final int STEP = 100;
-            super.paintComponent(g);
-            g.setColor(Color.blue);
-            radius = radius+STEP;
-            draw3d.
-            System.out.format("out");
-        }
+
+    public static void main(String args[]) {
+        JApplet applet = new VectorDivergenceCurl();
+        applet.init();
+        ogf = (Vec3DemoFrame)ogfl;
+        ogf.init();
+    }
+
+    
+    void showFrame() {
+	if (ogf == null) {
+	    started = true;
+	    ogf = new Vec3DemoFrame(this);
+	    ogf.init();
+	    repaint();
+	}
+    }
+    
+    public void paint(Graphics g) {
+	String s = "Applet is open in a separate window.";
+	if (!started)
+	    s = "Applet is starting.";
+	else if (ogf == null)
+	    s = "Applet is finished.";
+	else
+	    ogf.show();
+	g.drawString(s, 10, 30);
+    }
+    
+    public void componentHidden(ComponentEvent e){}
+    public void componentMoved(ComponentEvent e){}
+    public void componentShown(ComponentEvent e) { showFrame(); }
+    public void componentResized(ComponentEvent e) {}
+    
+    public void destroy() {
+	if (ogf != null)
+	    ogf.dispose();
+	ogf = null;
+	repaint();
     }
     /**
      * This method is called from within the init() method to initialize the
@@ -81,62 +119,37 @@ public class VectorDivergenceCurl extends javax.swing.JApplet {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new UpperViewPane();
-        jComboBox1 = new javax.swing.JComboBox();
-        jButton1 = new javax.swing.JButton();
+        ogfl = new Vec3DemoFrame(null);
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 432, Short.MAX_VALUE)
+        javax.swing.GroupLayout ogflLayout = new javax.swing.GroupLayout(ogfl.getContentPane());
+        ogfl.getContentPane().setLayout(ogflLayout);
+        ogflLayout.setHorizontalGroup(
+            ogflLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 384, Short.MAX_VALUE)
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+        ogflLayout.setVerticalGroup(
+            ogflLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 278, Short.MAX_VALUE)
         );
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        ogfl.getAccessibleContext().setAccessibleParent(this);
 
-        jButton1.setText("jButton1");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
+        setVisible(false);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(50, 50, 50)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1))
-                .addGap(0, 41, Short.MAX_VALUE))
+            .addGap(0, 400, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(29, 29, 29)
-                .addComponent(jButton1)
-                .addContainerGap(317, Short.MAX_VALUE))
+            .addGap(0, 308, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JComboBox jComboBox1;
-    public javax.swing.JPanel jPanel1;
+    private static javax.swing.JFrame ogfl;
     // End of variables declaration//GEN-END:variables
 }
