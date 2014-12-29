@@ -31,14 +31,14 @@ public class GraphPanel extends JPanel {
     private Color lineColor = new Color(44, 102, 230, 180);
     private Color pointColor = new Color(100, 100, 100, 180);
     private Color gridColor = new Color(200, 200, 200, 200);
-    private static final Stroke GRAPH_STROKE = new BasicStroke(2f,BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL);
-    private int pointWidth = 0; 
+    private static final Stroke GRAPH_STROKE = new BasicStroke(2f,BasicStroke.CAP_BUTT,BasicStroke.JOIN_MITER);
+    private int pointWidth = 10; 
     private int numberYDivisions = 10;
     private List<Double> plotdata;
     private double x_offset = 0;
-    private double x_multiplier = 1.0;
+    private double x_multiplier = 1;
  
-    private String x_format = "%.0f";
+    private String x_format = "%.1f";
     
     
     
@@ -86,14 +86,14 @@ public class GraphPanel extends JPanel {
                 g2.setColor(gridColor);
                 g2.drawLine(padding + labelPadding + 1 + pointWidth, y0, getWidth() - padding, y1);
                 g2.setColor(Color.BLACK);
-                String yLabel = ((double) ((getMinScore() + (getMaxScore() - getMinScore()) * ((i * 1.0) / numberYDivisions)))) + "";
+                String yLabel = ((double) ((getMinScore() + (getMaxScore() - getMinScore()) * (((double)i * 1.0) / numberYDivisions)))) + "";
                 FontMetrics metrics = g2.getFontMetrics();
                 int labelWidth = metrics.stringWidth(yLabel);
                 g2.drawString(yLabel, x0 - labelWidth - 5, y0 + (metrics.getHeight() / 2) - 3);
             }
             g2.drawLine(x0, y0, x1, y1);
         }
- 
+
         // and for x axis
         for (int i = 0; i < plotdata.size()+1; i++) {
             if (plotdata.size() > 1) {
@@ -106,7 +106,7 @@ public class GraphPanel extends JPanel {
                     g2.setColor(gridColor);
                     g2.drawLine(x0, getHeight() - padding - labelPadding - 1 - pointWidth, x1, padding);
                     g2.setColor(Color.BLACK);
-                    String xLabel = ((double)i*x_multiplier + x_offset) + "";   ///  change x_offset if wavelength region have to be changed....
+                    String xLabel = String.format(x_format,x_multiplier*(double)i+ x_offset) + "";   ///  change x_offset if wavelength region have to be changed....
                     FontMetrics metrics = g2.getFontMetrics();
                     int labelWidth = metrics.stringWidth(xLabel);
                     
@@ -135,13 +135,13 @@ public class GraphPanel extends JPanel {
  
         g2.setStroke(oldStroke);
         g2.setColor(pointColor);
-        for (int i = 0; i < graphPoints.size(); i++) {
-            int x = graphPoints.get(i).x - pointWidth / 2;
-            int y = graphPoints.get(i).y - pointWidth / 2;
-            int ovalW = pointWidth;
-            int ovalH = pointWidth;
-            g2.fillOval(x, y, ovalW, ovalH);
-        }
+//        for (int i = 0; i < graphPoints.size(); i++) {
+  //          int x = graphPoints.get(i).x - pointWidth / 2;
+    //        int y = graphPoints.get(i).y - pointWidth / 2;
+      //      int ovalW = pointWidth;
+        //    int ovalH = pointWidth;
+          //  g2.fillOval(x, y, ovalW, ovalH);
+  //      }
     }
  
 //    @Override
@@ -153,18 +153,18 @@ public class GraphPanel extends JPanel {
         double minScore = Double.MAX_VALUE;
         for (Double score : plotdata) {
             //minScore = Math.min(minScore, score);
-            if(score<minScore)minScore=score;
+            if(minScore>score)minScore=score;
         }
-        // return minScore;
+        return minScore;
         //return Math.floor(minScore/10)*10; // For making min value increase by 10
-        return 0;
+        //return 0;
     }
  
     private double getMaxScore() {
         double maxScore = Double.MIN_VALUE;
         for (Double score : plotdata) {
             //maxScore = Math.max(maxScore, score);
-            if(score>maxScore)maxScore=score;
+            if(maxScore<score)maxScore=score;
         }
         return maxScore;
         // return Math.ceil(maxScore/10)*10;  // For making max value increase by 10

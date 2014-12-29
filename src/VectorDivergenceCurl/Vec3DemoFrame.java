@@ -299,6 +299,8 @@ class ExprParser {
 //#endif
 
 
+
+
 /**
  *
  * @author 기진
@@ -1047,6 +1049,8 @@ Thread engine = null;
         double initpos[] = new double[3];
         double finalpos[] = new double[3];
 	double field[] = new double[3];
+        double min=0;
+        double max=0;
 	int slice = sliceChooser.getSelectedIndex()-SLICE_X;
 	if (slice < 0)
 	    slice = 0;
@@ -1061,24 +1065,37 @@ Thread engine = null;
 		pos[coord1] = x1;
 		pos[coord2] = y1;
 		pos[slice] = z;
-                if(i==0 && j==0)initpos = pos;
-                else if(i==ct-1 && j==ct-1)finalpos = pos;
                 curfunc.getField(field, pos);
+                if(i==0 && j==0){
+                    initpos = pos;
+                    finalpos = pos;
+                    min = field[2];
+                    max = field[2];
+                }
+                else{
+                    if(min>field[2])min=field[2];
+                    if(max<field[2])max=field[2];
+                    if(initpos[1]>pos[1])initpos=pos;
+                    if(finalpos[1]<pos[1])finalpos=pos;
+                }
+                
                 data.add(field[2]);
-                System.out.print(field[2]);
+                //System.out.print(field[2]);
             }
         }
         
+        System.out.print(distance(initpos));
+        System.out.print(distance(finalpos));
         graph.setPreferredSize(new Dimension(450,260));
         graph.removeAll();
         //GraphPanel gpanel = new GraphPanel(data);
         graph.setLayout(new java.awt.BorderLayout());
+        graph.setXoffset(distance(initpos));
+        graph.setXmultiplier(distance(finalpos)-distance(initpos)/data.size());
         graph.setScores(data);
-        graph.setXoffset(initpos[0]);
-        graph.setXmultiplier((finalpos[0]-initpos[0])/data.size());
         //graph.add(gpanel,BorderLayout.CENTER);
         graph.repaint();
-        //graph.validate();
+        graph.validate();
     }
 
     void drawCurrentArrow(Graphics g, int x1, int y1, int x2, int y2) {
@@ -2119,11 +2136,13 @@ Thread engine = null;
     public void componentMoved(ComponentEvent e){}
     public void componentShown(ComponentEvent e) {
 	cv.repaint(pause);
+        drawGraph();
     }
 
     public void componentResized(ComponentEvent e) {
 	handleResize();
 	cv.repaint(pause);
+        drawGraph();
     }
     public void actionPerformed(ActionEvent e) {
 	vectors = null;
@@ -2159,6 +2178,7 @@ Thread engine = null;
 	if (e.getSource() == partCountBar)
 	    resetDensityGroups();
 	cv.repaint(pause);
+        drawGraph();
     }
 
     public void mouseDragged(MouseEvent e) {
@@ -2180,12 +2200,14 @@ Thread engine = null;
 		lastYRot /= lr;
 	    }
 	    cv.repaint(pause);
+            drawGraph();
 	} else if (mode == MODE_ZOOM) {
 	    int xo = dragX-dragStartX;
 	    zoom = dragZoomStart + xo/20.;
 	    if (zoom < .1)
 		zoom = .1;
 	    cv.repaint(pause);
+            drawGraph();
 	} else if (mode == MODE_SLICE) {
 	    double x3[] = new double[3];
 	    unmap3d(x3, dragX, dragY, sliceFace, sliceFace, viewMain);
@@ -2204,6 +2226,7 @@ Thread engine = null;
 	    resetDensityGroups();
 	    //System.out.print(sliceval + "\n");
 	    cv.repaint(pause);
+            drawGraph();
 	    vectors = null;
 	}
 	
@@ -2325,6 +2348,7 @@ Thread engine = null;
     public void itemStateChanged(ItemEvent e) {
 	vectors = null;
 	cv.repaint(pause);
+        drawGraph();
 	reverse = (reverseCheck.getState()) ? -1 : 1;
 	if (e.getItemSelectable() == dispChooser) {
 	    dispChooserChanged();
@@ -6061,6 +6085,7 @@ Thread engine = null;
         graphPanel = new GraphPanel();
 
         graphFrame.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        graphFrame.setMinimumSize(new java.awt.Dimension(400, 300));
         graphFrame.setPreferredSize(new java.awt.Dimension(400, 300));
 
         javax.swing.GroupLayout graphPanelLayout = new javax.swing.GroupLayout(graphPanel);
@@ -6085,9 +6110,8 @@ Thread engine = null;
             .addComponent(graphPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
-        graphFrame.getAccessibleContext().setAccessibleParent(graphFrame);
-
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setMinimumSize(new java.awt.Dimension(400, 300));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
