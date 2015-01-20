@@ -5,7 +5,6 @@
  */
 package TerminalVelocity;
 
-import YoungDoubleSlit.YoungDoubleSlit;
 import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -24,16 +23,22 @@ import javax.swing.JPanel;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.data.xy.Vector;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.category.CategoryItemRenderer;
+import org.jfree.chart.renderer.category.LineAndShapeRenderer;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.category.CategoryDataset;
+import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-
 
 /**
  *
  * @author 기진
  */
+
 public class TerminalVelocity extends javax.swing.JApplet {
 
     /**
@@ -52,6 +57,8 @@ public class TerminalVelocity extends javax.swing.JApplet {
     XYSeries l2,l2v1,l2v2;
     javax.swing.Timer timer ;
     boolean isTimerOn;  
+    static ResultViewPane tempChartPanel;
+    static DrawViewPane tempDrawPanel;
 
     
     @Override
@@ -99,10 +106,12 @@ public class TerminalVelocity extends javax.swing.JApplet {
                String str[]=input.split("\\s"); //라인읽을 때 띄어쓰기 간격으로 하나씩 읽어 str읽어들어옴  내용다들어감
                System.out.println("\n"+str[0]+","+str[1]+","+str[2]);
                System.out.println(n);
+               if(Double.parseDouble(str[2])<1000){
                v1.add(Double.parseDouble(str[0]),Double.parseDouble(str[1]));
                System.out.println(n);
                l1.add(Double.parseDouble(str[0]),Double.parseDouble(str[2]));
-               System.out.println(n);
+              }
+                System.out.println(n);
                n++;
             }
             
@@ -110,43 +119,51 @@ public class TerminalVelocity extends javax.swing.JApplet {
             l1v1 = new XYSeries("Histogram of distance of sphere");
             while((input=br1v1.readLine())!=null){
                String str[]=input.split("\\s"); //라인읽을 때 띄어쓰기 간격으로 하나씩 읽어 str읽어들어옴  내용다들어감
+               if(Double.parseDouble(str[2])<1000){
                v1v1.add(Double.parseDouble(str[0]),Double.parseDouble(str[1]));
                l1v1.add(Double.parseDouble(str[0]),Double.parseDouble(str[2]));
-            }
+              }
+             }
             
             v1v2 = new XYSeries("Histogram of velocity of sphere");
             l1v2 = new XYSeries("Histogram of distance of sphere");
             while((input=br1v2.readLine())!=null){
                String str[]=input.split("\\s"); //라인읽을 때 띄어쓰기 간격으로 하나씩 읽어 str읽어들어옴  내용다들어감
+               if(Double.parseDouble(str[2])<1000){
                v1v2.add(Double.parseDouble(str[0]),Double.parseDouble(str[1]));
                l1v2.add(Double.parseDouble(str[0]),Double.parseDouble(str[2]));
+               }
             }
             
             v2 = new XYSeries("Histogram of velocity of plate");
             l2 = new XYSeries("Histogram of distance of plate");
             while((input=br2.readLine())!=null){
                String str[]=input.split("\\s"); //라인읽을 때 띄어쓰기 간격으로 하나씩 읽어 str읽어들어옴  내용다들어감
+               if(Double.parseDouble(str[2])<1000){
                v2.add(Double.parseDouble(str[0]),Double.parseDouble(str[1]));
                l2.add(Double.parseDouble(str[0]),Double.parseDouble(str[2]));
-            }
+              }
+             }
             
             v2v1 = new XYSeries("Histogram of velocity of plate");
             l2v1 = new XYSeries("Histogram of distance of plate");
             while((input=br2v1.readLine())!=null){
                String str[]=input.split("\\s"); //라인읽을 때 띄어쓰기 간격으로 하나씩 읽어 str읽어들어옴  내용다들어감
+               if(Double.parseDouble(str[2])<1000){
                v2v1.add(Double.parseDouble(str[0]),Double.parseDouble(str[1]));
                l2v1.add(Double.parseDouble(str[0]),Double.parseDouble(str[2]));
-            }
+              }
+             }
             
             v2v2 = new XYSeries("Histogram of velocity of plate");
             l2v2 = new XYSeries("Histogram of distance of plate");
             while((input=br2v2.readLine())!=null){
                String str[]=input.split("\\s"); //라인읽을 때 띄어쓰기 간격으로 하나씩 읽어 str읽어들어옴  내용다들어감
+               if(Double.parseDouble(str[2])<1000){
                v2v2.add(Double.parseDouble(str[0]),Double.parseDouble(str[1]));
                l2v2.add(Double.parseDouble(str[0]),Double.parseDouble(str[2]));
-            }         
-            ChartPanel = new ResultViewPane(getResultChart());
-            DrawPanel = new DrawViewPane();
+              }
+             }         
                  
             java.awt.EventQueue.invokeAndWait(new Runnable() {
                 public void run() {
@@ -202,8 +219,19 @@ public class TerminalVelocity extends javax.swing.JApplet {
 
     public JFreeChart getResultChart(){
         // XY시리즈를 Dataset 형태로 변경
-        XYSeriesCollection data = new XYSeriesCollection(v1);
-        final JFreeChart chart = ChartFactory.createXYLineChart("Amplitude of Light","Angle","Amp.",data,PlotOrientation.VERTICAL,true,true,false);
+        XYSeriesCollection data1 = new XYSeriesCollection(v1);
+        XYSeriesCollection data1v1 = new XYSeriesCollection(v1v1);
+        XYSeriesCollection data1v2 = new XYSeriesCollection(v1v2);
+        JFreeChart chart = ChartFactory.createXYLineChart("Amplitude of Light","Angle","Amp.",data1,PlotOrientation.VERTICAL,true,true,false);
+        XYPlot plot = chart.getXYPlot();
+        plot.setDataset(1, data1v1);
+        plot.setDataset(2, data1v2);
+        XYLineAndShapeRenderer render0 = new XYLineAndShapeRenderer();
+        XYLineAndShapeRenderer render1 = new XYLineAndShapeRenderer();
+        XYLineAndShapeRenderer render2 = new XYLineAndShapeRenderer();
+        plot.setRenderer(0,render0);
+        plot.setRenderer(1,render1);
+        plot.setRenderer(2,render2);
         chart.setTitle("Amplitude of light"); // 차트 타이틀
         System.out.println(v1.getItemCount());
         return chart;
@@ -219,14 +247,13 @@ public class TerminalVelocity extends javax.swing.JApplet {
         {
             super.paintComponent(g2);
             if ( isTimerOn ) {
-
-            }
             Graphics2D g2d = (Graphics2D)g2;
             Ellipse2D.Double hole = new Ellipse2D.Double();
-            hole.width = 28;
-            hole.height = 28;
-            hole.x = 14;
-            hole.y = 14;
+            hole.width = 100;
+            hole.height = 100;
+            hole.x = 50;
+            hole.y = 50;
+            }
             System.out.println("draw there!");
         }
     }
@@ -259,8 +286,8 @@ public class TerminalVelocity extends javax.swing.JApplet {
         MainFrame = new javax.swing.JFrame();
         buttonGroup1 = new javax.swing.ButtonGroup();
         jInternalFrame1 = new javax.swing.JInternalFrame();
-        DrawPanel = new javax.swing.JPanel();
-        ChartPanel = new javax.swing.JPanel();
+        DrawPanel = DrawPanel = new DrawViewPane();
+        ChartPanel = ChartPanel = new ResultViewPane(getResultChart());
         PlateButton = new javax.swing.JRadioButton();
         SphereButton = new javax.swing.JRadioButton();
         SecField = new javax.swing.JTextField();
