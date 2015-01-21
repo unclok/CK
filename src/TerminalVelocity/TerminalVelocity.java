@@ -8,6 +8,7 @@ package TerminalVelocity;
 import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Ellipse2D;
@@ -19,10 +20,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.ImageIcon;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.event.PlotChangeEvent;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
@@ -55,11 +64,21 @@ public class TerminalVelocity extends javax.swing.JApplet {
     XYSeries l1,l1v1,l1v2;
     XYSeries v2,v2v1,v2v2;
     XYSeries l2,l2v1,l2v2;
+    Vector vv1 = new Vector(); 
+    Vector vl1 = new Vector(); 
+    Vector vv1v1 = new Vector(); 
+    Vector vv1v2 = new Vector(); 
+    Vector vv2 = new Vector(); 
+    Vector vl2 = new Vector(); 
+    Vector vv2v1 = new Vector(); 
+    Vector vv2v2 = new Vector(); 
+    int n;
     javax.swing.Timer timer ;
     boolean isTimerOn;  
     static ResultViewPane tempChartPanel;
     static DrawViewPane tempDrawPanel;
-
+    static ArrayList<Thread> threads = new ArrayList<Thread>();
+    ImageIcon cloud1,cloud2,mountain;
     
     @Override
     public void init() {
@@ -85,7 +104,14 @@ public class TerminalVelocity extends javax.swing.JApplet {
             java.util.logging.Logger.getLogger(TerminalVelocity.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-
+        n=0;
+        SecField = new JTextField();
+        DistanceField = new JTextField();
+        SpeedField = new JTextField();
+        SecField.setText("0.00");
+        DistanceField.setText("0.00");
+        SpeedField.setText("0.00");
+        
         /* Create and display the applet */
         try {
             InputStream path = this.getClass().getResourceAsStream("data/table10cm"); // 현재 클래스의 절대 경로를 가져온다.
@@ -103,24 +129,20 @@ public class TerminalVelocity extends javax.swing.JApplet {
             v1 = new XYSeries("Histogram of velocity of sphere");
             l1 = new XYSeries("Histogram of distance of sphere");
             while((input=br1.readLine())!=null){
-               String str[]=input.split("\\s"); //라인읽을 때 띄어쓰기 간격으로 하나씩 읽어 str읽어들어옴  내용다들어감
-               System.out.println("\n"+str[0]+","+str[1]+","+str[2]);
-               System.out.println(n);
-               if(Double.parseDouble(str[2])<1000){
-               v1.add(Double.parseDouble(str[0]),Double.parseDouble(str[1]));
-               System.out.println(n);
-               l1.add(Double.parseDouble(str[0]),Double.parseDouble(str[2]));
-              }
-                System.out.println(n);
-               n++;
-            }
+                String str[]=input.split("\\s"); //라인읽을 때 띄어쓰기 간격으로 하나씩 읽어 str읽어들어옴  내용다들어감
+                if(Double.parseDouble(str[2])<1000){
+                //v1.add(Double.parseDouble(str[0]),Double.parseDouble(str[1]));
+                vv1.add(Double.parseDouble(str[1]));
+                vl1.add(Double.parseDouble(str[2]));
+                }
+            }  
             
             v1v1 = new XYSeries("Histogram of velocity of sphere");
             l1v1 = new XYSeries("Histogram of distance of sphere");
             while((input=br1v1.readLine())!=null){
                String str[]=input.split("\\s"); //라인읽을 때 띄어쓰기 간격으로 하나씩 읽어 str읽어들어옴  내용다들어감
                if(Double.parseDouble(str[2])<1000){
-               v1v1.add(Double.parseDouble(str[0]),Double.parseDouble(str[1]));
+               vv1v1.add(Double.parseDouble(str[1]));
                l1v1.add(Double.parseDouble(str[0]),Double.parseDouble(str[2]));
               }
              }
@@ -130,7 +152,7 @@ public class TerminalVelocity extends javax.swing.JApplet {
             while((input=br1v2.readLine())!=null){
                String str[]=input.split("\\s"); //라인읽을 때 띄어쓰기 간격으로 하나씩 읽어 str읽어들어옴  내용다들어감
                if(Double.parseDouble(str[2])<1000){
-               v1v2.add(Double.parseDouble(str[0]),Double.parseDouble(str[1]));
+               vv1v2.add(Double.parseDouble(str[1]));
                l1v2.add(Double.parseDouble(str[0]),Double.parseDouble(str[2]));
                }
             }
@@ -140,7 +162,7 @@ public class TerminalVelocity extends javax.swing.JApplet {
             while((input=br2.readLine())!=null){
                String str[]=input.split("\\s"); //라인읽을 때 띄어쓰기 간격으로 하나씩 읽어 str읽어들어옴  내용다들어감
                if(Double.parseDouble(str[2])<1000){
-               v2.add(Double.parseDouble(str[0]),Double.parseDouble(str[1]));
+               vv2.add(Double.parseDouble(str[1]));
                l2.add(Double.parseDouble(str[0]),Double.parseDouble(str[2]));
               }
              }
@@ -150,7 +172,7 @@ public class TerminalVelocity extends javax.swing.JApplet {
             while((input=br2v1.readLine())!=null){
                String str[]=input.split("\\s"); //라인읽을 때 띄어쓰기 간격으로 하나씩 읽어 str읽어들어옴  내용다들어감
                if(Double.parseDouble(str[2])<1000){
-               v2v1.add(Double.parseDouble(str[0]),Double.parseDouble(str[1]));
+               vv2v1.add(Double.parseDouble(str[1]));
                l2v1.add(Double.parseDouble(str[0]),Double.parseDouble(str[2]));
               }
              }
@@ -160,7 +182,7 @@ public class TerminalVelocity extends javax.swing.JApplet {
             while((input=br2v2.readLine())!=null){
                String str[]=input.split("\\s"); //라인읽을 때 띄어쓰기 간격으로 하나씩 읽어 str읽어들어옴  내용다들어감
                if(Double.parseDouble(str[2])<1000){
-               v2v2.add(Double.parseDouble(str[0]),Double.parseDouble(str[1]));
+               vv2v2.add(Double.parseDouble(str[1]));
                l2v2.add(Double.parseDouble(str[0]),Double.parseDouble(str[2]));
               }
              }         
@@ -188,7 +210,7 @@ public class TerminalVelocity extends javax.swing.JApplet {
         public void timerStart()
     {   if ( timer == null ){
             System.out.println("Start Timer!!");                    
-            timer = new javax.swing.Timer(100,new aListener()); 
+            timer = new javax.swing.Timer(1,new aListener()); 
             timer.stop();
         }
         timer.start();
@@ -199,14 +221,85 @@ public class TerminalVelocity extends javax.swing.JApplet {
         timer.stop();
         isTimerOn = false;
     }
-    public class aListener implements ActionListener 
-    {       
-                public void actionPerformed(ActionEvent e) {                    
+    public class aListener implements ActionListener
+    {
+                    public void actionPerformed(ActionEvent e) {
+                        tempDrawPanel = (DrawViewPane)DrawPanel;
+                        tempChartPanel = (ResultViewPane)ChartPanel;                                      
+
                     if ( isTimerOn ) {
-                        System.out.println("On Timer!!");
-                        //System.out.println( (int) theWaveLengthSlider.getValue()) ;
-                       DrawPanel.repaint();
-                       ChartPanel.repaint();
+                        if(n==0){
+                            v1.clear();
+                            l1.clear();
+                            v1v1.clear();
+                            v1v2.clear();
+                            v2.clear();
+                            l2.clear();
+                            v2v1.clear();
+                            v2v2.clear();
+                            SecField.setText("0.00");
+                            DistanceField.setText("0.00");
+                            SpeedField.setText("0.00");
+                        }
+                        if(vv1.size()>=n+1){
+                            SecField.setText(String.format("%.2f",n*0.04));
+                            if(vv1.size()>=n+1){
+                                v1.add(n*0.04, (double) vv1.get(n));
+                                SpeedField.setText(String.format("%.2f",(double)vv1.get(n)));
+                            }
+                            if(vl1.size()>=n+1){
+                                l1.add(n*0.04, (double) vl1.get(n));
+                                DistanceField.setText(String.format("%.2f",(double)vl1.get(n)));
+                            }
+                            if(vv1v1.size()>=n+1)v1v1.add(n*0.04, (double) vv1v1.get(n));
+                            if(vv1v2.size()>=n+1){v1v2.add(n*0.04, (double) vv1v2.get(n));
+                            n++;}
+ //                           SecField.setText(String.format("%.2f",n*0.04));
+                            if(vv1.size()>=n+1){
+                                v1.add(n*0.04, (double) vv1.get(n));
+//                                SpeedField.setText(String.format("%.2f",(double)vv1.get(n)));
+                            }
+                            if(vl1.size()>=n+1){
+                                l1.add(n*0.04, (double) vl1.get(n));
+//                                DistanceField.setText(String.format("%.2f",(double)vl1.get(n)));
+                            }
+                            if(vv1v1.size()>=n+1)v1v1.add(n*0.04, (double) vv1v1.get(n));
+                            if(vv1v2.size()>=n+1){v1v2.add(n*0.04, (double) vv1v2.get(n));
+                            n++;}
+//                            SecField.setText(String.format("%.2f",n*0.04));
+                            if(vv1.size()>=n+1){
+                                v1.add(n*0.04, (double) vv1.get(n));
+//                                SpeedField.setText(String.format("%.2f",(double)vv1.get(n)));
+                            }
+                            if(vl1.size()>=n+1){
+                                l1.add(n*0.04, (double) vl1.get(n));
+//                                DistanceField.setText(String.format("%.2f",(double)vl1.get(n)));
+                            }
+                            if(vv1v1.size()>=n+1)v1v1.add(n*0.04, (double) vv1v1.get(n));
+                            if(vv1v2.size()>=n+1){v1v2.add(n*0.04, (double) vv1v2.get(n));
+                            n++;}
+                            SecField.setText(String.format("%.2f",n*0.04));
+                            if(vv1.size()>=n+1){
+                                v1.add(n*0.04, (double) vv1.get(n));
+                                SpeedField.setText(String.format("%.2f",(double)vv1.get(n)));
+                            }
+                            if(vl1.size()>=n+1){
+                                l1.add(n*0.04, (double) vl1.get(n));
+                                DistanceField.setText(String.format("%.2f",(double)vl1.get(n)));
+                            }
+                            if(vv1v1.size()>=n+1)v1v1.add(n*0.04, (double) vv1v1.get(n));
+                            if(vv1v2.size()>=n+1){v1v2.add(n*0.04, (double) vv1v2.get(n));
+                            n++;}
+                            tempDrawPanel.repaint((double) vl1.get(n-1));
+                            tempChartPanel.repaint(getResultChart(v1,v1v1,v1v2));
+                        }
+                        else
+                        {
+                            isTimerOn = false;
+                            StartButton.setText("Start");
+                            n = 0;
+                        }
+                        
                     }
                     else {
                         System.out.println("Already Stop Timer!!");
@@ -214,10 +307,24 @@ public class TerminalVelocity extends javax.swing.JApplet {
                 }
             //}
     };
-    
+/*    
+    public class Threadrun implements Runnable{
+        int seq;
+        public Threadrun(int seq) {
+            this.seq = seq;
+        }
+        public void run() {
+            System.out.println(this.seq+" thread start.");
+            try {
+                Thread.sleep(1000);
+            }catch(Exception e) {
+            }
+            System.out.println(this.seq+" thread end.");
+        }
+    }
+*/
 
-
-    public JFreeChart getResultChart(){
+    public JFreeChart getResultChart(XYSeries v1, XYSeries v1v1, XYSeries v1v2){
         // XY시리즈를 Dataset 형태로 변경
         XYSeriesCollection data1 = new XYSeriesCollection(v1);
         XYSeriesCollection data1v1 = new XYSeriesCollection(v1v1);
@@ -226,6 +333,10 @@ public class TerminalVelocity extends javax.swing.JApplet {
         XYPlot plot = chart.getXYPlot();
         plot.setDataset(1, data1v1);
         plot.setDataset(2, data1v2);
+        NumberAxis domainX = (NumberAxis)plot.getDomainAxis();
+        domainX.setRange(0.,16.);
+        NumberAxis rangeY = (NumberAxis)plot.getRangeAxis();
+        rangeY.setRange(0.,160.);
         XYLineAndShapeRenderer render0 = new XYLineAndShapeRenderer();
         XYLineAndShapeRenderer render1 = new XYLineAndShapeRenderer();
         XYLineAndShapeRenderer render2 = new XYLineAndShapeRenderer();
@@ -233,44 +344,54 @@ public class TerminalVelocity extends javax.swing.JApplet {
         plot.setRenderer(1,render1);
         plot.setRenderer(2,render2);
         chart.setTitle("Amplitude of light"); // 차트 타이틀
-        System.out.println(v1.getItemCount());
+        chart.plotChanged(new PlotChangeEvent(plot));
+//        System.out.println(v1.getItemCount());
         return chart;
     }
 
-    public class DrawViewPane extends JPanel{        
+    public class DrawViewPane extends JPanel{
         DrawViewPane(){                        
             super();
-            System.out.println("draw here!");
         }
-
-        public void paintComponent(Graphics g2)
-        {
-            super.paintComponent(g2);
-            if ( isTimerOn ) {
-            Graphics2D g2d = (Graphics2D)g2;
-            Ellipse2D.Double hole = new Ellipse2D.Double();
-            hole.width = 100;
-            hole.height = 100;
-            hole.x = 50;
-            hole.y = 50;
-            }
-            System.out.println("draw there!");
+      
+        public void paintComponent(Double height){
+            super.paintComponent(this.getGraphics());
+            Ellipse2D.Double hole = new Ellipse2D.Double(DrawPanel.getWidth()/2,DrawPanel.getHeight()/10 + DrawPanel.getHeight()*9*height/1000/10,10,10);
+            Graphics2D g2d = (Graphics2D)this.getGraphics();
+            g2d.draw(hole);            
+        }
+        
+        public void repaint(Double height){
+            paintComponent(height);
+            repaint();
         }
     }
     
     public class ResultViewPane extends ChartPanel{        
         ResultViewPane(JFreeChart chart){                        
             super(chart);
-            System.out.println("I'm here!");
         }
 
         public void paintComponent(Graphics g2)
         {
             super.paintComponent(g2);
             if ( isTimerOn ) {
-                this.setChart(getResultChart());
+                this.setChart(this.getChart());
             }
-            System.out.println("I'm there!");
+        }
+        
+        public void paintComponent(JFreeChart chart)
+        {
+            super.paintComponent(this.getGraphics());
+            if ( isTimerOn ) {
+                this.setChart(chart);
+            }
+        }
+        
+        public void repaint(JFreeChart chart)
+        {
+            this.paintComponent(chart);
+            repaint();
         }
     }
 
@@ -283,11 +404,10 @@ public class TerminalVelocity extends javax.swing.JApplet {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        MainFrame = new javax.swing.JFrame();
         buttonGroup1 = new javax.swing.ButtonGroup();
         jInternalFrame1 = new javax.swing.JInternalFrame();
         DrawPanel = DrawPanel = new DrawViewPane();
-        ChartPanel = ChartPanel = new ResultViewPane(getResultChart());
+        ChartPanel = ChartPanel = new ResultViewPane(getResultChart(v1,v1v1,v1v2));
         PlateButton = new javax.swing.JRadioButton();
         SphereButton = new javax.swing.JRadioButton();
         SecField = new javax.swing.JTextField();
@@ -295,33 +415,28 @@ public class TerminalVelocity extends javax.swing.JApplet {
         SecLabel = new javax.swing.JLabel();
         SpeedLabel = new javax.swing.JLabel();
         StartButton = new javax.swing.JButton();
+        DistanceField = new javax.swing.JTextField();
+        DistanceLabel = new javax.swing.JLabel();
 
-        MainFrame.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        setMinimumSize(new java.awt.Dimension(400, 419));
 
-        javax.swing.GroupLayout MainFrameLayout = new javax.swing.GroupLayout(MainFrame.getContentPane());
-        MainFrame.getContentPane().setLayout(MainFrameLayout);
-        MainFrameLayout.setHorizontalGroup(
-            MainFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-        MainFrameLayout.setVerticalGroup(
-            MainFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-
+        jInternalFrame1.setResizable(true);
+        jInternalFrame1.setMinimumSize(new java.awt.Dimension(400, 415));
         jInternalFrame1.setVisible(true);
 
         DrawPanel.setBackground(new java.awt.Color(255, 255, 255));
+        DrawPanel.setMinimumSize(new java.awt.Dimension(200, 150));
+        DrawPanel.setPreferredSize(new java.awt.Dimension(281, 150));
 
         javax.swing.GroupLayout DrawPanelLayout = new javax.swing.GroupLayout(DrawPanel);
         DrawPanel.setLayout(DrawPanelLayout);
         DrawPanelLayout.setHorizontalGroup(
             DrawPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGap(0, 290, Short.MAX_VALUE)
         );
         DrawPanelLayout.setVerticalGroup(
             DrawPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 203, Short.MAX_VALUE)
+            .addGap(0, 227, Short.MAX_VALUE)
         );
 
         ChartPanel.setBackground(new java.awt.Color(255, 255, 255));
@@ -330,11 +445,11 @@ public class TerminalVelocity extends javax.swing.JApplet {
         ChartPanel.setLayout(ChartPanelLayout);
         ChartPanelLayout.setHorizontalGroup(
             ChartPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 281, Short.MAX_VALUE)
+            .addGap(0, 290, Short.MAX_VALUE)
         );
         ChartPanelLayout.setVerticalGroup(
             ChartPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 122, Short.MAX_VALUE)
+            .addGap(0, 153, Short.MAX_VALUE)
         );
 
         PlateButton.setText("1kg plate");
@@ -346,9 +461,9 @@ public class TerminalVelocity extends javax.swing.JApplet {
             }
         });
 
-        SecField.setText("jTextField1");
+        SecField.setText("0.00");
 
-        SpeedField.setText("jTextField2");
+        SpeedField.setText("0.00");
         SpeedField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 SpeedFieldActionPerformed(evt);
@@ -366,6 +481,10 @@ public class TerminalVelocity extends javax.swing.JApplet {
             }
         });
 
+        DistanceField.setText("0.00");
+
+        DistanceLabel.setText("m");
+
         javax.swing.GroupLayout jInternalFrame1Layout = new javax.swing.GroupLayout(jInternalFrame1.getContentPane());
         jInternalFrame1.getContentPane().setLayout(jInternalFrame1Layout);
         jInternalFrame1Layout.setHorizontalGroup(
@@ -373,27 +492,31 @@ public class TerminalVelocity extends javax.swing.JApplet {
             .addGroup(jInternalFrame1Layout.createSequentialGroup()
                 .addGroup(jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(ChartPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(DrawPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(DrawPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 290, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(SphereButton)
-                    .addGroup(jInternalFrame1Layout.createSequentialGroup()
-                        .addComponent(SecField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(SecLabel))
-                    .addGroup(jInternalFrame1Layout.createSequentialGroup()
-                        .addComponent(SpeedField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(SpeedLabel))
                     .addComponent(StartButton)
-                    .addComponent(PlateButton)))
+                    .addComponent(PlateButton)
+                    .addGroup(jInternalFrame1Layout.createSequentialGroup()
+                        .addGroup(jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(DistanceField, javax.swing.GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE)
+                            .addComponent(SecField, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(SpeedField, javax.swing.GroupLayout.Alignment.LEADING))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(SpeedLabel)
+                            .addComponent(DistanceLabel)
+                            .addComponent(SecLabel)))))
         );
         jInternalFrame1Layout.setVerticalGroup(
             jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jInternalFrame1Layout.createSequentialGroup()
-                .addGroup(jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(DrawPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jInternalFrame1Layout.createSequentialGroup()
+                .addGroup(jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jInternalFrame1Layout.createSequentialGroup()
+                        .addComponent(DrawPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 227, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED))
+                    .addGroup(jInternalFrame1Layout.createSequentialGroup()
                         .addGap(40, 40, 40)
                         .addComponent(SphereButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -406,10 +529,16 @@ public class TerminalVelocity extends javax.swing.JApplet {
                         .addGroup(jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(SpeedField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(SpeedLabel))
-                        .addGap(28, 28, 28)
-                        .addComponent(StartButton)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(ChartPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(DistanceField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(DistanceLabel))
+                        .addGap(27, 27, 27)))
+                .addGroup(jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jInternalFrame1Layout.createSequentialGroup()
+                        .addComponent(StartButton)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(ChartPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
 
         StartButton.getAccessibleContext().setAccessibleName("StartButton");
@@ -418,11 +547,11 @@ public class TerminalVelocity extends javax.swing.JApplet {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jInternalFrame1)
+            .addComponent(jInternalFrame1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jInternalFrame1)
+            .addComponent(jInternalFrame1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -449,8 +578,9 @@ public class TerminalVelocity extends javax.swing.JApplet {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel ChartPanel;
+    private javax.swing.JTextField DistanceField;
+    private javax.swing.JLabel DistanceLabel;
     private javax.swing.JPanel DrawPanel;
-    private javax.swing.JFrame MainFrame;
     private javax.swing.JRadioButton PlateButton;
     private javax.swing.JTextField SecField;
     private javax.swing.JLabel SecLabel;
