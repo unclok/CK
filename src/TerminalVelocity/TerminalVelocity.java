@@ -10,6 +10,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Ellipse2D;
@@ -70,11 +71,12 @@ public class TerminalVelocity extends javax.swing.JApplet {
     Vector vv2v2 = new Vector(); 
     int n;
     javax.swing.Timer timer ;
-    boolean isTimerOn;  
-    int timersteptime = 100;
+    boolean isTimerOn,isSphereSelected,isPlateSelected;  
+    int timersteptime = 200;
     static ResultViewPane tempChartPanel;
     static DrawViewPane tempDrawPanel;
     Ellipse2D.Double hole = new Ellipse2D.Double();
+    Rectangle.Double plate = new Rectangle.Double();
        
     //static ArrayList<Thread> threads = new ArrayList<Thread>();
     Image cloud1,cloud2,mountain,background;
@@ -113,7 +115,9 @@ public class TerminalVelocity extends javax.swing.JApplet {
         tempDrawPanel = (DrawViewPane)DrawPanel;
         tempChartPanel = (ResultViewPane)ChartPanel;     
         hole.height = 10;
-        hole.width = 10;            
+        hole.width = 10;      
+        plate.height = 1;
+        plate.width = 30;
 
         /* Create and display the applet */
         try {
@@ -128,6 +132,8 @@ public class TerminalVelocity extends javax.swing.JApplet {
             mountain = ImageIO.read(mountainpath);
             background = ImageIO.read(backgroundpath);
             background = background.getScaledInstance(400,300,Image.SCALE_SMOOTH);
+            isSphereSelected = true;
+            isPlateSelected = false;
             
             // BufferedReader 객체 생성
 
@@ -139,7 +145,7 @@ public class TerminalVelocity extends javax.swing.JApplet {
             br2v2 = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("data/table30cmv2")));
             
             int n = 0;
-            v1 = new XYSeries("Histogram of velocity of sphere");
+            v1 = new XYSeries("original velocity of sphere");
             l1 = new XYSeries("Histogram of distance of sphere");
             while((input=br1.readLine())!=null){
                 String str[]=input.split("\\s"); //라인읽을 때 띄어쓰기 간격으로 하나씩 읽어 str읽어들어옴  내용다들어감
@@ -150,7 +156,7 @@ public class TerminalVelocity extends javax.swing.JApplet {
                 }
             }  
             
-            v1v1 = new XYSeries("Histogram of velocity of sphere");
+            v1v1 = new XYSeries("velocity of sphere(drag ∝ velocity)");
             l1v1 = new XYSeries("Histogram of distance of sphere");
             while((input=br1v1.readLine())!=null){
                String str[]=input.split("\\s"); //라인읽을 때 띄어쓰기 간격으로 하나씩 읽어 str읽어들어옴  내용다들어감
@@ -160,7 +166,7 @@ public class TerminalVelocity extends javax.swing.JApplet {
               }
              }
             
-            v1v2 = new XYSeries("Histogram of velocity of sphere");
+            v1v2 = new XYSeries("velocity of sphere(drag ∝ square of velocity)");
             l1v2 = new XYSeries("Histogram of distance of sphere");
             while((input=br1v2.readLine())!=null){
                String str[]=input.split("\\s"); //라인읽을 때 띄어쓰기 간격으로 하나씩 읽어 str읽어들어옴  내용다들어감
@@ -170,17 +176,17 @@ public class TerminalVelocity extends javax.swing.JApplet {
                }
             }
             
-            v2 = new XYSeries("Histogram of velocity of plate");
+            v2 = new XYSeries("original velocity of plate");
             l2 = new XYSeries("Histogram of distance of plate");
             while((input=br2.readLine())!=null){
                String str[]=input.split("\\s"); //라인읽을 때 띄어쓰기 간격으로 하나씩 읽어 str읽어들어옴  내용다들어감
                if(Double.parseDouble(str[2])<1000){
                vv2.add(Double.parseDouble(str[1]));
-               l2.add(Double.parseDouble(str[0]),Double.parseDouble(str[2]));
+               vl2.add(Double.parseDouble(str[2]));
               }
              }
             
-            v2v1 = new XYSeries("Histogram of velocity of plate");
+            v2v1 = new XYSeries("velocity of plate(drag ∝ velocity)");
             l2v1 = new XYSeries("Histogram of distance of plate");
             while((input=br2v1.readLine())!=null){
                String str[]=input.split("\\s"); //라인읽을 때 띄어쓰기 간격으로 하나씩 읽어 str읽어들어옴  내용다들어감
@@ -190,7 +196,7 @@ public class TerminalVelocity extends javax.swing.JApplet {
               }
              }
             
-            v2v2 = new XYSeries("Histogram of velocity of plate");
+            v2v2 = new XYSeries("velocity of plate(drag ∝ square of velocity)");
             l2v2 = new XYSeries("Histogram of distance of plate");
             while((input=br2v2.readLine())!=null){
                String str[]=input.split("\\s"); //라인읽을 때 띄어쓰기 간격으로 하나씩 읽어 str읽어들어옴  내용다들어감
@@ -219,6 +225,8 @@ public class TerminalVelocity extends javax.swing.JApplet {
             if(br2v1 != null) try{br2v1.close();}catch(IOException e){}
             if(br2v2 != null) try{br2v2.close();}catch(IOException e){}
 	}
+        buttonGroup1.add(SphereButton);
+        buttonGroup1.add(PlateButton);
     }
     
         public void timerStart()
@@ -235,6 +243,7 @@ public class TerminalVelocity extends javax.swing.JApplet {
         timer.stop();
         isTimerOn = false;
     }
+
     public class aListener implements ActionListener
     {
                     public void actionPerformed(ActionEvent e) {
@@ -255,8 +264,9 @@ public class TerminalVelocity extends javax.swing.JApplet {
                             SpeedField.setText("0.00");
                         }
                         int onestepcount = (int)(timersteptime/40);//count for one timer step
-                        for(int i=0;i<onestepcount;i++){
+                        if(isSphereSelected){
                         if(vv1.size()>=n+1){                                
+                        for(int i=0;i<onestepcount;i++){
                             if(vv1.size()>=n+1){
                                 v1.add(n*0.04, (double) vv1.get(n));
                             }
@@ -264,16 +274,18 @@ public class TerminalVelocity extends javax.swing.JApplet {
                                 l1.add(n*0.04, (double) vl1.get(n));
                             }
                             if(vv1v1.size()>=n+1)v1v1.add(n*0.04, (double) vv1v1.get(n));
-                            if(vv1v2.size()>=n+1){v1v2.add(n*0.04, (double) vv1v2.get(n));
-                            n++;}
-                            if(i==onestepcount-1 || vl1.size() == n+1){
+                            if(vv1v2.size()>=n+1)v1v2.add(n*0.04, (double) vv1v2.get(n));
+                            if((i==onestepcount-1 && vl1.size()>n+1) || vl1.size() == n+1){
                                 SecField.setText(String.format("%.2f",n*0.04));
                                 DistanceField.setText(String.format("%.2f",(double)vl1.get(n)));
                                 SpeedField.setText(String.format("%.2f",(double)vv1.get(n)));
-                                tempDrawPanel.setHeight((double) vl1.get(n-1));
+                                tempDrawPanel.setHeight((double) vl1.get(n));
                                 tempDrawPanel.repaint();
-                                tempChartPanel.repaint(getResultChart(v1,v1v1,v1v2));
+                                tempChartPanel.setChart(getResultChart(v1,v1v1,v1v2));
+                                tempChartPanel.repaint();
                             }
+                            n++;
+                        }
                         }
                         else
                         {
@@ -281,8 +293,42 @@ public class TerminalVelocity extends javax.swing.JApplet {
                             StartButton.setText("Start");
                             n = 0;
                             tempDrawPanel.repaint();
+                            tempChartPanel.setChart(getResultChart(v1,v1v1,v1v2));
+                            tempChartPanel.repaint();
                         }
-                        
+                        }
+                        else if(isPlateSelected){                         
+                        if(vv2.size()>=n+1){       
+                        for(int i=0;i<onestepcount;i++){
+                            if(vv2.size()>=n+1){
+                                v2.add(n*0.04, (double) vv2.get(n));
+                            }
+                            if(vl2.size()>=n+1){
+                                l2.add(n*0.04, (double) vl2.get(n));
+                            }
+                            if(vv2v1.size()>=n+1)v2v1.add(n*0.04, (double) vv2v1.get(n));
+                            if(vv2v2.size()>=n+1)v2v2.add(n*0.04, (double) vv2v2.get(n));
+                            if((i==onestepcount-1 && vl2.size()>n+1) || vl2.size() == n+1){
+                                SecField.setText(String.format("%.2f",n*0.04));
+                                DistanceField.setText(String.format("%.2f",(double)vl2.get(n)));
+                                SpeedField.setText(String.format("%.2f",(double)vv2.get(n)));
+                                tempDrawPanel.setHeight((double) vl2.get(n));
+                                tempDrawPanel.repaint();
+                                tempChartPanel.setChart(getResultChart(v2,v2v1,v2v2));
+                                tempChartPanel.repaint();
+                            }
+                            n++;
+                        }
+                        }
+                        else
+                        {
+                            isTimerOn = false;
+                            StartButton.setText("Start");
+                            n = 0;
+                            tempDrawPanel.repaint();
+                            tempChartPanel.setChart(getResultChart(v2,v2v1,v2v2));
+                            tempChartPanel.repaint();
+                        }
                         }
                     }
                     else {
@@ -308,26 +354,32 @@ public class TerminalVelocity extends javax.swing.JApplet {
     }
 */
 
-    public JFreeChart getResultChart(XYSeries v1, XYSeries v1v1, XYSeries v1v2){
+    public JFreeChart getResultChart(XYSeries x1, XYSeries x1v1, XYSeries x1v2){
         // XY시리즈를 Dataset 형태로 변경
-        XYSeriesCollection data1 = new XYSeriesCollection(v1);
-        XYSeriesCollection data1v1 = new XYSeriesCollection(v1v1);
-        XYSeriesCollection data1v2 = new XYSeriesCollection(v1v2);
+        XYSeriesCollection data1 = new XYSeriesCollection(x1);
+        XYSeriesCollection data1v1 = new XYSeriesCollection(x1v1);
+        XYSeriesCollection data1v2 = new XYSeriesCollection(x1v2);
         JFreeChart chart = ChartFactory.createXYLineChart("Terminal Velocity","sec","Velocity[m/s]",data1,PlotOrientation.VERTICAL,true,true,false);
         XYPlot plot = chart.getXYPlot();
         plot.setDataset(1, data1v1);
         plot.setDataset(2, data1v2);
         NumberAxis domainX = (NumberAxis)plot.getDomainAxis();
-        domainX.setRange(0.,16.);
         NumberAxis rangeY = (NumberAxis)plot.getRangeAxis();
-        rangeY.setRange(0.,160.);
+        if(isSphereSelected){
+            domainX.setRange(0.,16.);
+            rangeY.setRange(0.,160.);
+        }
+        else if(isPlateSelected){
+            domainX.setRange(0.,50.);
+            rangeY.setRange(0.,50.);
+        }
         XYLineAndShapeRenderer render0 = new XYLineAndShapeRenderer();
         XYLineAndShapeRenderer render1 = new XYLineAndShapeRenderer();
         XYLineAndShapeRenderer render2 = new XYLineAndShapeRenderer();
         plot.setRenderer(0,render0);
         plot.setRenderer(1,render1);
         plot.setRenderer(2,render2);
-        chart.setTitle("Amplitude of light"); // 차트 타이틀
+        chart.setTitle("Terminal Velocity"); // 차트 타이틀
         chart.plotChanged(new PlotChangeEvent(plot));
 //        System.out.println(v1.getItemCount());
         return chart;
@@ -343,15 +395,25 @@ public class TerminalVelocity extends javax.swing.JApplet {
             Graphics2D g2d = (Graphics2D)g;
             g2d.drawImage(background, 0 ,0, DrawPanel.getWidth(),DrawPanel.getHeight(), this);
             
-            hole.x = DrawPanel.getWidth()/2;
-            if(!isTimerOn)hole.y = DrawPanel.getHeight()/10;
-            g2d.setColor(Color.gray);
-            g2d.fill(hole);
-            g2d.draw(hole);            
+            if(isSphereSelected){
+                hole.x = DrawPanel.getWidth()/2;
+                if(!isTimerOn)hole.y = DrawPanel.getHeight()/10;
+                g2d.setColor(Color.gray);
+                g2d.fill(hole);
+                g2d.draw(hole);            
+            }
+            else if(isPlateSelected){
+                plate.x = DrawPanel.getWidth()/2;
+                if(!isTimerOn)plate.y = DrawPanel.getHeight()/10;
+                g2d.setColor(Color.gray);
+                g2d.fill(plate);
+                g2d.draw(plate);            
+            }
         }
 
         public void setHeight(Double height){
-            hole.y = DrawPanel.getHeight()/10 + DrawPanel.getHeight()*9*height/1000/10;
+            hole.y = DrawPanel.getHeight()/10 + DrawPanel.getHeight()*9*height/10000;
+            plate.y = DrawPanel.getHeight()/10 + DrawPanel.getHeight()*9*height/10000;
         }
     }
     
@@ -368,18 +430,9 @@ public class TerminalVelocity extends javax.swing.JApplet {
             }
         }
         
-        public void paintComponent(JFreeChart chart)
+        public void SetChart(JFreeChart chart)
         {
-            super.paintComponent(this.getGraphics());
-            if ( isTimerOn ) {
                 this.setChart(chart);
-            }
-        }
-        
-        public void repaint(JFreeChart chart)
-        {
-            this.paintComponent(chart);
-            repaint();
         }
     }
 
@@ -441,7 +494,13 @@ public class TerminalVelocity extends javax.swing.JApplet {
         );
 
         PlateButton.setText("1kg plate");
+        PlateButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                PlateButtonActionPerformed(evt);
+            }
+        });
 
+        SphereButton.setSelected(true);
         SphereButton.setText("1kg sphere");
         SphereButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -549,6 +608,19 @@ public class TerminalVelocity extends javax.swing.JApplet {
 
     private void SphereButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SphereButtonActionPerformed
         // TODO add your handling code here:
+        tempDrawPanel = (DrawViewPane)DrawPanel;
+        tempChartPanel = (ResultViewPane)ChartPanel;     
+        isSphereSelected = true;
+        if(isPlateSelected){
+            isPlateSelected = false;
+            n = 0;
+            isTimerOn = false;
+            StartButton.setText("Start");
+            tempDrawPanel.repaint();
+            tempChartPanel.setChart(getResultChart(v1,v1v1,v1v2));
+            tempChartPanel.repaint();
+        }
+        isPlateSelected = false;
     }//GEN-LAST:event_SphereButtonActionPerformed
 
     private void StartButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_StartButtonActionPerformed
@@ -562,6 +634,23 @@ public class TerminalVelocity extends javax.swing.JApplet {
             timerStart();
         }
     }//GEN-LAST:event_StartButtonActionPerformed
+
+    private void PlateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PlateButtonActionPerformed
+        // TODO add your handling code here:
+        tempDrawPanel = (DrawViewPane)DrawPanel;
+        tempChartPanel = (ResultViewPane)ChartPanel;     
+        isPlateSelected = true;
+        if(isSphereSelected){
+            isSphereSelected = false;
+            n = 0;
+            isTimerOn = false;
+            StartButton.setText("Start");
+            tempDrawPanel.repaint();
+            tempChartPanel.setChart(getResultChart(v1,v1v1,v1v2));
+            tempChartPanel.repaint();
+        }
+        isSphereSelected = false;
+    }//GEN-LAST:event_PlateButtonActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
