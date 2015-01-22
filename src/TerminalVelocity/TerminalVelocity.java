@@ -254,6 +254,7 @@ public class TerminalVelocity extends javax.swing.JApplet {
                             DistanceField.setText("0.00");
                             SpeedField.setText("0.00");
                         }
+                        int onestepcount = 40;//
                         for(int i=0;i<40;i++){
                         if(vv1.size()>=n+1){
                                 
