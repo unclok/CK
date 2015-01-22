@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -78,7 +79,7 @@ public class TerminalVelocity extends javax.swing.JApplet {
     static ResultViewPane tempChartPanel;
     static DrawViewPane tempDrawPanel;
     static ArrayList<Thread> threads = new ArrayList<Thread>();
-    ImageIcon cloud1,cloud2,mountain;
+    Image cloud1,cloud2,mountain;
     
     @Override
     public void init() {
@@ -110,12 +111,22 @@ public class TerminalVelocity extends javax.swing.JApplet {
         SpeedField = new JTextField();
         SecField.setText("0.00");
         DistanceField.setText("0.00");
-        SpeedField.setText("0.00");
+        SpeedField.setText("0.00"); 
+        
         
         /* Create and display the applet */
         try {
+            InputStream cloud1path = this.getClass().getResourceAsStream("data/cloud1.png");
+            InputStream cloud2path = this.getClass().getResourceAsStream("data/cloud2.png");
+            InputStream mountainpath = this.getClass().getResourceAsStream("data/southmountain.png");
             InputStream path = this.getClass().getResourceAsStream("data/table10cm"); // 현재 클래스의 절대 경로를 가져온다.
             System.out.println(path);
+            cloud1 = ImageIO.read(cloud1path);
+            cloud2 = ImageIO.read(cloud2path);
+            mountain = ImageIO.read(mountainpath);
+            cloud1 = cloud1.getScaledInstance(DrawPanel.getHeight()/10,DrawPanel.getHeight()/100,Image.SCALE_DEFAULT);
+            cloud2 = cloud2.getScaledInstance(DrawPanel.getHeight()/10,DrawPanel.getHeight()/100,Image.SCALE_DEFAULT);
+            
             // BufferedReader 객체 생성
 
             br1 = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("data/table10cm")));
@@ -359,6 +370,8 @@ public class TerminalVelocity extends javax.swing.JApplet {
             Ellipse2D.Double hole = new Ellipse2D.Double(DrawPanel.getWidth()/2,DrawPanel.getHeight()/10 + DrawPanel.getHeight()*9*height/1000/10,10,10);
             Graphics2D g2d = (Graphics2D)this.getGraphics();
             g2d.draw(hole);            
+            g2d.drawImage(cloud1, DrawPanel.getWidth()*3/10-DrawPanel.getHeight()/20 ,DrawPanel.getHeight()*1/100-DrawPanel.getHeight()/200, this);
+            g2d.drawImage(cloud2, DrawPanel.getWidth()*3/10-DrawPanel.getHeight()/20 ,DrawPanel.getHeight()*1/100-DrawPanel.getHeight()/200, this);
         }
         
         public void repaint(Double height){
