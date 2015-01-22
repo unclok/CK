@@ -116,10 +116,6 @@ public class TerminalVelocity extends javax.swing.JApplet {
         SpeedField.setText("0.00"); 
         tempDrawPanel = (DrawViewPane)DrawPanel;
         tempChartPanel = (ResultViewPane)ChartPanel;     
-        hole.height = 10;
-        hole.width = 10;      
-        plate.height = 1;
-        plate.width = 30;
 
         /* Create and display the applet */
         try {
@@ -211,6 +207,10 @@ public class TerminalVelocity extends javax.swing.JApplet {
             java.awt.EventQueue.invokeAndWait(new Runnable() {
                 public void run() {
                     initComponents();
+                    hole.height = DrawPanel.getWidth()/100;
+                    hole.width = DrawPanel.getWidth()/100;      
+                    plate.height = DrawPanel.getWidth()/1000;
+                    plate.width = DrawPanel.getWidth()*3/100;
                     isTimerOn = false;   
                     timer = null;
                     DrawPanel.repaint();
@@ -391,15 +391,23 @@ public class TerminalVelocity extends javax.swing.JApplet {
 
     public class DrawViewPane extends JPanel{
         DrawViewPane(){                        
-            super();       
+            super();    
         }
 
         public void paintComponent(Graphics g){
             super.paintComponent(g);
             Graphics2D g2d = (Graphics2D)g;
             g2d.drawImage(background, 0 ,0, DrawPanel.getWidth(),DrawPanel.getHeight(), this);
-            
+           
             if(isSphereSelected){
+                if(DrawPanel.getWidth()/100<10){
+                    hole.width = 10;
+                    hole.height = 10;
+                }
+                else{
+                    hole.width = DrawPanel.getWidth()/100;
+                    hole.height = DrawPanel.getWidth()/100;
+                }      
                 hole.x = DrawPanel.getWidth()/2;
                 if(!isTimerOn)hole.y = DrawPanel.getHeight()/10;
                 g2d.setColor(Color.gray);
@@ -407,6 +415,14 @@ public class TerminalVelocity extends javax.swing.JApplet {
                 g2d.draw(hole);            
             }
             else if(isPlateSelected){
+                if(DrawPanel.getWidth()/100<10){
+                    plate.height = 1;
+                    plate.width = 30;   
+                }
+                else{
+                    plate.height = DrawPanel.getWidth()/1000;
+                    plate.width = DrawPanel.getWidth()*3/100;   
+                }
                 plate.x = DrawPanel.getWidth()/2;
                 if(!isTimerOn)plate.y = DrawPanel.getHeight()/10;
                 g2d.setColor(Color.gray);
