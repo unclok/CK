@@ -130,7 +130,7 @@
             </Property>
           </Properties>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="DrawPanel = new DrawViewPane();"/>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new DrawViewPane();"/>
           </AuxValues>
 
           <Layout>

@@ -6,6 +6,7 @@
 package TerminalVelocity;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -25,7 +26,6 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import org.jfree.chart.ChartFactory;
@@ -33,14 +33,9 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.event.PlotChangeEvent;
-import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.category.CategoryItemRenderer;
-import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
-import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
@@ -78,8 +73,10 @@ public class TerminalVelocity extends javax.swing.JApplet {
     boolean isTimerOn;  
     static ResultViewPane tempChartPanel;
     static DrawViewPane tempDrawPanel;
-    static ArrayList<Thread> threads = new ArrayList<Thread>();
-    Image cloud1,cloud2,mountain;
+    Ellipse2D.Double hole = new Ellipse2D.Double();
+       
+    //static ArrayList<Thread> threads = new ArrayList<Thread>();
+    Image cloud1,cloud2,mountain,background;
     
     @Override
     public void init() {
@@ -112,10 +109,14 @@ public class TerminalVelocity extends javax.swing.JApplet {
         SecField.setText("0.00");
         DistanceField.setText("0.00");
         SpeedField.setText("0.00"); 
-        
-        
+        tempDrawPanel = (DrawViewPane)DrawPanel;
+        tempChartPanel = (ResultViewPane)ChartPanel;     
+        hole.height = 10;
+        hole.width = 10;            
+
         /* Create and display the applet */
         try {
+            InputStream backgroundpath = this.getClass().getResourceAsStream("data/background.png");
             InputStream cloud1path = this.getClass().getResourceAsStream("data/cloud1.png");
             InputStream cloud2path = this.getClass().getResourceAsStream("data/cloud2.png");
             InputStream mountainpath = this.getClass().getResourceAsStream("data/southmountain.png");
@@ -124,8 +125,7 @@ public class TerminalVelocity extends javax.swing.JApplet {
             cloud1 = ImageIO.read(cloud1path);
             cloud2 = ImageIO.read(cloud2path);
             mountain = ImageIO.read(mountainpath);
-            cloud1 = cloud1.getScaledInstance(DrawPanel.getHeight()/10,DrawPanel.getHeight()/100,Image.SCALE_DEFAULT);
-            cloud2 = cloud2.getScaledInstance(DrawPanel.getHeight()/10,DrawPanel.getHeight()/100,Image.SCALE_DEFAULT);
+            background = ImageIO.read(backgroundpath);
             
             // BufferedReader 객체 생성
 
@@ -197,12 +197,13 @@ public class TerminalVelocity extends javax.swing.JApplet {
                l2v2.add(Double.parseDouble(str[0]),Double.parseDouble(str[2]));
               }
              }         
-                 
+            
             java.awt.EventQueue.invokeAndWait(new Runnable() {
                 public void run() {
                     initComponents();
                     isTimerOn = false;   
                     timer = null;
+                    DrawPanel.repaint();
                 }
             }); 
         } catch (Exception ex) {
@@ -216,12 +217,14 @@ public class TerminalVelocity extends javax.swing.JApplet {
             if(br2v1 != null) try{br2v1.close();}catch(IOException e){}
             if(br2v2 != null) try{br2v2.close();}catch(IOException e){}
 	}
+        hole.x = DrawPanel.getWidth()/2;
+        hole.y = DrawPanel.getHeight()/10;
     }
     
         public void timerStart()
     {   if ( timer == null ){
             System.out.println("Start Timer!!");                    
-            timer = new javax.swing.Timer(1,new aListener()); 
+            timer = new javax.swing.Timer(10,new aListener()); 
             timer.stop();
         }
         timer.start();
@@ -235,9 +238,8 @@ public class TerminalVelocity extends javax.swing.JApplet {
     public class aListener implements ActionListener
     {
                     public void actionPerformed(ActionEvent e) {
-                        tempDrawPanel = (DrawViewPane)DrawPanel;
-                        tempChartPanel = (ResultViewPane)ChartPanel;                                      
-
+                    tempDrawPanel = (DrawViewPane)DrawPanel;
+                    tempChartPanel = (ResultViewPane)ChartPanel;     
                     if ( isTimerOn ) {
                         if(n==0){
                             v1.clear();
@@ -252,65 +254,33 @@ public class TerminalVelocity extends javax.swing.JApplet {
                             DistanceField.setText("0.00");
                             SpeedField.setText("0.00");
                         }
+                        for(int i=0;i<40;i++){
                         if(vv1.size()>=n+1){
-                            SecField.setText(String.format("%.2f",n*0.04));
+                                
+                            if(i==39)SecField.setText(String.format("%.2f",n*0.04));
                             if(vv1.size()>=n+1){
                                 v1.add(n*0.04, (double) vv1.get(n));
-                                SpeedField.setText(String.format("%.2f",(double)vv1.get(n)));
+                                if(i==39)SpeedField.setText(String.format("%.2f",(double)vv1.get(n)));
                             }
                             if(vl1.size()>=n+1){
                                 l1.add(n*0.04, (double) vl1.get(n));
-                                DistanceField.setText(String.format("%.2f",(double)vl1.get(n)));
+                                if(i==3)DistanceField.setText(String.format("%.2f",(double)vl1.get(n)));
                             }
                             if(vv1v1.size()>=n+1)v1v1.add(n*0.04, (double) vv1v1.get(n));
                             if(vv1v2.size()>=n+1){v1v2.add(n*0.04, (double) vv1v2.get(n));
                             n++;}
- //                           SecField.setText(String.format("%.2f",n*0.04));
-                            if(vv1.size()>=n+1){
-                                v1.add(n*0.04, (double) vv1.get(n));
-//                                SpeedField.setText(String.format("%.2f",(double)vv1.get(n)));
-                            }
-                            if(vl1.size()>=n+1){
-                                l1.add(n*0.04, (double) vl1.get(n));
-//                                DistanceField.setText(String.format("%.2f",(double)vl1.get(n)));
-                            }
-                            if(vv1v1.size()>=n+1)v1v1.add(n*0.04, (double) vv1v1.get(n));
-                            if(vv1v2.size()>=n+1){v1v2.add(n*0.04, (double) vv1v2.get(n));
-                            n++;}
-//                            SecField.setText(String.format("%.2f",n*0.04));
-                            if(vv1.size()>=n+1){
-                                v1.add(n*0.04, (double) vv1.get(n));
-//                                SpeedField.setText(String.format("%.2f",(double)vv1.get(n)));
-                            }
-                            if(vl1.size()>=n+1){
-                                l1.add(n*0.04, (double) vl1.get(n));
-//                                DistanceField.setText(String.format("%.2f",(double)vl1.get(n)));
-                            }
-                            if(vv1v1.size()>=n+1)v1v1.add(n*0.04, (double) vv1v1.get(n));
-                            if(vv1v2.size()>=n+1){v1v2.add(n*0.04, (double) vv1v2.get(n));
-                            n++;}
-                            SecField.setText(String.format("%.2f",n*0.04));
-                            if(vv1.size()>=n+1){
-                                v1.add(n*0.04, (double) vv1.get(n));
-                                SpeedField.setText(String.format("%.2f",(double)vv1.get(n)));
-                            }
-                            if(vl1.size()>=n+1){
-                                l1.add(n*0.04, (double) vl1.get(n));
-                                DistanceField.setText(String.format("%.2f",(double)vl1.get(n)));
-                            }
-                            if(vv1v1.size()>=n+1)v1v1.add(n*0.04, (double) vv1v1.get(n));
-                            if(vv1v2.size()>=n+1){v1v2.add(n*0.04, (double) vv1v2.get(n));
-                            n++;}
-                            tempDrawPanel.repaint((double) vl1.get(n-1));
-                            tempChartPanel.repaint(getResultChart(v1,v1v1,v1v2));
+                            if(i==39)tempDrawPanel.repaint((double) vl1.get(n-1));
+                            if(i==39)tempChartPanel.repaint(getResultChart(v1,v1v1,v1v2));
                         }
                         else
                         {
                             isTimerOn = false;
                             StartButton.setText("Start");
                             n = 0;
+                            tempDrawPanel.repaint();
                         }
                         
+                        }
                     }
                     else {
                         System.out.println("Already Stop Timer!!");
@@ -364,14 +334,26 @@ public class TerminalVelocity extends javax.swing.JApplet {
         DrawViewPane(){                        
             super();
         }
-      
+
+        public void paintComponent(Graphics g){
+            super.paintComponent(g);
+            Graphics2D g2d = (Graphics2D)g;
+            g2d.drawImage(background, 0 ,0, DrawPanel.getWidth(),DrawPanel.getHeight(), this);
+            g2d.setColor(Color.gray);
+            g2d.fill(hole);
+            g2d.draw(hole);            
+        }
+
+        
         public void paintComponent(Double height){
             super.paintComponent(this.getGraphics());
-            Ellipse2D.Double hole = new Ellipse2D.Double(DrawPanel.getWidth()/2,DrawPanel.getHeight()/10 + DrawPanel.getHeight()*9*height/1000/10,10,10);
             Graphics2D g2d = (Graphics2D)this.getGraphics();
-            g2d.draw(hole);            
-            g2d.drawImage(cloud1, DrawPanel.getWidth()*3/10-DrawPanel.getHeight()/20 ,DrawPanel.getHeight()*1/100-DrawPanel.getHeight()/200, this);
-            g2d.drawImage(cloud2, DrawPanel.getWidth()*3/10-DrawPanel.getHeight()/20 ,DrawPanel.getHeight()*1/100-DrawPanel.getHeight()/200, this);
+            g2d.drawImage(background, 0 ,0, DrawPanel.getWidth(),DrawPanel.getHeight(), this);        
+            hole.x = DrawPanel.getWidth()/2;
+            hole.y = DrawPanel.getHeight()/10 + DrawPanel.getHeight()*9*height/1000/10;
+            g2d.setColor(Color.gray);
+            g2d.fill(hole);
+            g2d.draw(hole);
         }
         
         public void repaint(Double height){
@@ -419,7 +401,7 @@ public class TerminalVelocity extends javax.swing.JApplet {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
         jInternalFrame1 = new javax.swing.JInternalFrame();
-        DrawPanel = DrawPanel = new DrawViewPane();
+        DrawPanel = new DrawViewPane();
         ChartPanel = ChartPanel = new ResultViewPane(getResultChart(v1,v1v1,v1v2));
         PlateButton = new javax.swing.JRadioButton();
         SphereButton = new javax.swing.JRadioButton();
