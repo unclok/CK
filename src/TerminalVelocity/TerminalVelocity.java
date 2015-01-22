@@ -71,6 +71,7 @@ public class TerminalVelocity extends javax.swing.JApplet {
     int n;
     javax.swing.Timer timer ;
     boolean isTimerOn;  
+    int timersteptime = 100;
     static ResultViewPane tempChartPanel;
     static DrawViewPane tempDrawPanel;
     Ellipse2D.Double hole = new Ellipse2D.Double();
@@ -126,6 +127,7 @@ public class TerminalVelocity extends javax.swing.JApplet {
             cloud2 = ImageIO.read(cloud2path);
             mountain = ImageIO.read(mountainpath);
             background = ImageIO.read(backgroundpath);
+            background = background.getScaledInstance(400,300,Image.SCALE_SMOOTH);
             
             // BufferedReader 객체 생성
 
@@ -217,14 +219,12 @@ public class TerminalVelocity extends javax.swing.JApplet {
             if(br2v1 != null) try{br2v1.close();}catch(IOException e){}
             if(br2v2 != null) try{br2v2.close();}catch(IOException e){}
 	}
-        hole.x = DrawPanel.getWidth()/2;
-        hole.y = DrawPanel.getHeight()/10;
     }
     
         public void timerStart()
     {   if ( timer == null ){
             System.out.println("Start Timer!!");                    
-            timer = new javax.swing.Timer(10,new aListener()); 
+            timer = new javax.swing.Timer(timersteptime,new aListener()); 
             timer.stop();
         }
         timer.start();
@@ -254,24 +254,26 @@ public class TerminalVelocity extends javax.swing.JApplet {
                             DistanceField.setText("0.00");
                             SpeedField.setText("0.00");
                         }
-                        int onestepcount = 40;//
-                        for(int i=0;i<40;i++){
-                        if(vv1.size()>=n+1){
-                                
-                            if(i==39)SecField.setText(String.format("%.2f",n*0.04));
+                        int onestepcount = (int)(timersteptime/40);//count for one timer step
+                        for(int i=0;i<onestepcount;i++){
+                        if(vv1.size()>=n+1){                                
                             if(vv1.size()>=n+1){
                                 v1.add(n*0.04, (double) vv1.get(n));
-                                if(i==39)SpeedField.setText(String.format("%.2f",(double)vv1.get(n)));
                             }
                             if(vl1.size()>=n+1){
                                 l1.add(n*0.04, (double) vl1.get(n));
-                                if(i==3)DistanceField.setText(String.format("%.2f",(double)vl1.get(n)));
                             }
                             if(vv1v1.size()>=n+1)v1v1.add(n*0.04, (double) vv1v1.get(n));
                             if(vv1v2.size()>=n+1){v1v2.add(n*0.04, (double) vv1v2.get(n));
                             n++;}
-                            if(i==39)tempDrawPanel.repaint((double) vl1.get(n-1));
-                            if(i==39)tempChartPanel.repaint(getResultChart(v1,v1v1,v1v2));
+                            if(i==onestepcount-1 || vl1.size() == n+1){
+                                SecField.setText(String.format("%.2f",n*0.04));
+                                DistanceField.setText(String.format("%.2f",(double)vl1.get(n)));
+                                SpeedField.setText(String.format("%.2f",(double)vv1.get(n)));
+                                tempDrawPanel.setHeight((double) vl1.get(n-1));
+                                tempDrawPanel.repaint();
+                                tempChartPanel.repaint(getResultChart(v1,v1v1,v1v2));
+                            }
                         }
                         else
                         {
@@ -311,7 +313,7 @@ public class TerminalVelocity extends javax.swing.JApplet {
         XYSeriesCollection data1 = new XYSeriesCollection(v1);
         XYSeriesCollection data1v1 = new XYSeriesCollection(v1v1);
         XYSeriesCollection data1v2 = new XYSeriesCollection(v1v2);
-        JFreeChart chart = ChartFactory.createXYLineChart("Amplitude of Light","Angle","Amp.",data1,PlotOrientation.VERTICAL,true,true,false);
+        JFreeChart chart = ChartFactory.createXYLineChart("Terminal Velocity","sec","Velocity[m/s]",data1,PlotOrientation.VERTICAL,true,true,false);
         XYPlot plot = chart.getXYPlot();
         plot.setDataset(1, data1v1);
         plot.setDataset(2, data1v2);
@@ -333,33 +335,23 @@ public class TerminalVelocity extends javax.swing.JApplet {
 
     public class DrawViewPane extends JPanel{
         DrawViewPane(){                        
-            super();
+            super();       
         }
 
         public void paintComponent(Graphics g){
             super.paintComponent(g);
             Graphics2D g2d = (Graphics2D)g;
             g2d.drawImage(background, 0 ,0, DrawPanel.getWidth(),DrawPanel.getHeight(), this);
+            
+            hole.x = DrawPanel.getWidth()/2;
+            if(!isTimerOn)hole.y = DrawPanel.getHeight()/10;
             g2d.setColor(Color.gray);
             g2d.fill(hole);
             g2d.draw(hole);            
         }
 
-        
-        public void paintComponent(Double height){
-            super.paintComponent(this.getGraphics());
-            Graphics2D g2d = (Graphics2D)this.getGraphics();
-            g2d.drawImage(background, 0 ,0, DrawPanel.getWidth(),DrawPanel.getHeight(), this);        
-            hole.x = DrawPanel.getWidth()/2;
+        public void setHeight(Double height){
             hole.y = DrawPanel.getHeight()/10 + DrawPanel.getHeight()*9*height/1000/10;
-            g2d.setColor(Color.gray);
-            g2d.fill(hole);
-            g2d.draw(hole);
-        }
-        
-        public void repaint(Double height){
-            paintComponent(height);
-            repaint();
         }
     }
     
