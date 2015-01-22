@@ -50,7 +50,7 @@
               <Group type="102" alignment="0" attributes="0">
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="ChartPanel" max="32767" attributes="0"/>
-                      <Component id="DrawPanel" pref="290" max="32767" attributes="0"/>
+                      <Component id="DrawPanel" pref="226" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
@@ -136,7 +136,7 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="290" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="226" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
@@ -153,13 +153,13 @@
             </Property>
           </Properties>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="ChartPanel = new ResultViewPane(getResultChart(v1,v1v1,v1v2));"/>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new ResultViewPane(getResultChart(v1,v1v1,v1v2));"/>
           </AuxValues>
 
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="290" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="226" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
@@ -171,7 +171,7 @@
         </Container>
         <Component class="javax.swing.JRadioButton" name="PlateButton">
           <Properties>
-            <Property name="text" type="java.lang.String" value="1kg plate"/>
+            <Property name="text" type="java.lang.String" value="1kg l=30cm iorn plate"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="PlateButtonActionPerformed"/>
@@ -180,7 +180,7 @@
         <Component class="javax.swing.JRadioButton" name="SphereButton">
           <Properties>
             <Property name="selected" type="boolean" value="true"/>
-            <Property name="text" type="java.lang.String" value="1kg sphere"/>
+            <Property name="text" type="java.lang.String" value="1kg r=5cm iorn sphere"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="SphereButtonActionPerformed"/>
@@ -189,11 +189,19 @@
         <Component class="javax.swing.JTextField" name="SecField">
           <Properties>
             <Property name="text" type="java.lang.String" value="0.00"/>
+            <Property name="disabledTextColor" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="0" green="0" red="0" type="rgb"/>
+            </Property>
+            <Property name="enabled" type="boolean" value="false"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="SpeedField">
           <Properties>
             <Property name="text" type="java.lang.String" value="0.00"/>
+            <Property name="disabledTextColor" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="0" green="0" red="0" type="rgb"/>
+            </Property>
+            <Property name="enabled" type="boolean" value="false"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="SpeedFieldActionPerformed"/>
@@ -223,6 +231,10 @@
         <Component class="javax.swing.JTextField" name="DistanceField">
           <Properties>
             <Property name="text" type="java.lang.String" value="0.00"/>
+            <Property name="disabledTextColor" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="0" green="0" red="0" type="rgb"/>
+            </Property>
+            <Property name="enabled" type="boolean" value="false"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="DistanceLabel">
