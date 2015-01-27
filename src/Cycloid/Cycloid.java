@@ -8,6 +8,15 @@ package Cycloid;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.Timer;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.event.PlotChangeEvent;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 
 /**
  *
@@ -21,6 +30,16 @@ public class Cycloid extends javax.swing.JApplet {
     int n = 0;
     ActionListener action;
     boolean isTimerOn = false;
+    XYSeriesCollection data1 = new XYSeriesCollection();
+    XYSeriesCollection data1v1 = new XYSeriesCollection();
+    XYSeriesCollection data1v2 = new XYSeriesCollection();
+    JFreeChart chart = ChartFactory.createXYLineChart("Terminal Velocity","sec","Velocity[m/s]",data1,PlotOrientation.VERTICAL,true,true,false);
+    XYPlot plot = new XYPlot();
+    XYLineAndShapeRenderer render1 = new XYLineAndShapeRenderer();
+    XYLineAndShapeRenderer render2 = new XYLineAndShapeRenderer();
+    XYLineAndShapeRenderer render3 = new XYLineAndShapeRenderer();
+    NumberAxis domainX = new NumberAxis();
+    NumberAxis rangeY = new NumberAxis();
     /**
      * Initializes the applet Cycloid
      */
@@ -60,9 +79,17 @@ public class Cycloid extends javax.swing.JApplet {
 
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            drawpanel.setTime(n);
-                            drawpanel.repaint();
-                            n++;
+                            if( isTimerOn && n>150){
+                                timer.stop();
+                                StartButton.setText("Start");
+                                n = 0;
+                                isTimerOn = false;
+                            }
+                            else {
+                                drawpanel.setTime(n);
+                                drawpanel.repaint();
+                                n++;
+                            }
                         }
                     });
                 }
@@ -71,6 +98,34 @@ public class Cycloid extends javax.swing.JApplet {
             ex.printStackTrace();
         }
     }
+    
+    public JFreeChart getResultChart(XYSeries x1, XYSeries x1v1, XYSeries x1v2){
+        data1.removeAllSeries();
+        data1v1.removeAllSeries();
+        data1v2.removeAllSeries();
+        // XY시리즈를 Dataset 형태로 변경
+        data1.addSeries(x1);
+        data1v1.addSeries(x1v1);
+        data1v2.addSeries(x1v2);
+        plot = chart.getXYPlot();
+        plot.setDataset(1, data1v2);
+        plot.setDataset(2, data1v1);
+        domainX = (NumberAxis)plot.getDomainAxis();
+        rangeY = (NumberAxis)plot.getRangeAxis();
+        //domainX.setRange(0.,16.);
+        //rangeY.setRange(0.,160.);
+        render1.setSeriesShapesVisible(0, false);
+        render2.setSeriesLinesVisible(0, false);
+        render3.setSeriesLinesVisible(0, false);
+        plot.setRenderer(2,render3);
+        plot.setRenderer(0,render1);
+        plot.setRenderer(1,render2);
+        chart.setTitle("Terminal Velocity"); // 차트 타이틀
+        chart.plotChanged(new PlotChangeEvent(plot));
+//        System.out.println(v1.getItemCount());
+        return chart;
+    }
+
 
     /**
      * This method is called from within the init() method to initialize the
@@ -84,8 +139,17 @@ public class Cycloid extends javax.swing.JApplet {
         jInternalFrame1 = new javax.swing.JInternalFrame();
         drawnpanel = new DrawPanel();
         StartButton = new javax.swing.JButton();
+        rgraph = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
 
         jInternalFrame1.setVisible(true);
+
+        drawnpanel.setBackground(new java.awt.Color(255, 255, 255));
 
         javax.swing.GroupLayout drawnpanelLayout = new javax.swing.GroupLayout(drawnpanel);
         drawnpanel.setLayout(drawnpanelLayout);
@@ -95,7 +159,7 @@ public class Cycloid extends javax.swing.JApplet {
         );
         drawnpanelLayout.setVerticalGroup(
             drawnpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 299, Short.MAX_VALUE)
+            .addGap(0, 223, Short.MAX_VALUE)
         );
 
         StartButton.setText("Start");
@@ -107,23 +171,75 @@ public class Cycloid extends javax.swing.JApplet {
             }
         });
 
+        jLabel1.setText("r1=i*bwt + j*b");
+
+        jLabel2.setText("r2=i*bcos(wt) + j*bsin(wt)");
+
+        jLabel3.setText("r=r1 + r2");
+
+        jLabel4.setText("v1=i*bw");
+
+        jLabel5.setText("v2=-i*bwsin(wt) + j*bwcos(wt)");
+
+        jLabel6.setText("v=v1 + v2");
+
+        javax.swing.GroupLayout rgraphLayout = new javax.swing.GroupLayout(rgraph);
+        rgraph.setLayout(rgraphLayout);
+        rgraphLayout.setHorizontalGroup(
+            rgraphLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(rgraphLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(rgraphLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(rgraphLayout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel3))
+                    .addGroup(rgraphLayout.createSequentialGroup()
+                        .addComponent(jLabel4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel5)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel6)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        rgraphLayout.setVerticalGroup(
+            rgraphLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(rgraphLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(rgraphLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(jLabel2)
+                    .addComponent(jLabel3))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(rgraphLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(jLabel5)
+                    .addComponent(jLabel6))
+                .addContainerGap(24, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout jInternalFrame1Layout = new javax.swing.GroupLayout(jInternalFrame1.getContentPane());
         jInternalFrame1.getContentPane().setLayout(jInternalFrame1Layout);
         jInternalFrame1Layout.setHorizontalGroup(
             jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jInternalFrame1Layout.createSequentialGroup()
-                .addComponent(drawnpanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jInternalFrame1Layout.createSequentialGroup()
+                .addGroup(jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(drawnpanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(rgraph, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(StartButton)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addComponent(StartButton))
         );
         jInternalFrame1Layout.setVerticalGroup(
             jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(drawnpanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jInternalFrame1Layout.createSequentialGroup()
                 .addGap(66, 66, 66)
-                .addComponent(StartButton)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(StartButton))
+            .addGroup(jInternalFrame1Layout.createSequentialGroup()
+                .addComponent(drawnpanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(rgraph, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -157,5 +273,12 @@ public class Cycloid extends javax.swing.JApplet {
     private javax.swing.JButton StartButton;
     private javax.swing.JPanel drawnpanel;
     private javax.swing.JInternalFrame jInternalFrame1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JPanel rgraph;
     // End of variables declaration//GEN-END:variables
 }
