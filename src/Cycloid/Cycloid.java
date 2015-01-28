@@ -147,6 +147,7 @@ public class Cycloid extends javax.swing.JApplet {
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
 
+        setMinimumSize(new java.awt.Dimension(800, 600));
         setPreferredSize(new java.awt.Dimension(800, 600));
 
         jInternalFrame1.setVisible(true);
@@ -157,7 +158,7 @@ public class Cycloid extends javax.swing.JApplet {
         drawnpanel.setLayout(drawnpanelLayout);
         drawnpanelLayout.setHorizontalGroup(
             drawnpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 320, Short.MAX_VALUE)
+            .addGap(0, 720, Short.MAX_VALUE)
         );
         drawnpanelLayout.setVerticalGroup(
             drawnpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -219,7 +220,7 @@ public class Cycloid extends javax.swing.JApplet {
                     .addComponent(jLabel4)
                     .addComponent(jLabel5)
                     .addComponent(jLabel6))
-                .addContainerGap(24, Short.MAX_VALUE))
+                .addContainerGap(291, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jInternalFrame1Layout = new javax.swing.GroupLayout(jInternalFrame1.getContentPane());
