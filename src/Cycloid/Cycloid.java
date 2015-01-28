@@ -147,6 +147,8 @@ public class Cycloid extends javax.swing.JApplet {
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
 
+        setPreferredSize(new java.awt.Dimension(800, 600));
+
         jInternalFrame1.setVisible(true);
 
         drawnpanel.setBackground(new java.awt.Color(255, 255, 255));
