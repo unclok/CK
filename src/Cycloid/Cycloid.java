@@ -82,7 +82,7 @@ public class Cycloid extends javax.swing.JApplet {
                             if( isTimerOn && n>120){
                                 timer.stop();
                                 StartButton.setText("Start");
-                                n = 0;
+                                n = 0; 
                                 isTimerOn = false;
                             }
                             else {
