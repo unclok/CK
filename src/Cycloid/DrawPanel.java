@@ -17,7 +17,7 @@ import static java.lang.Math.sin;
 import java.util.ArrayList;
 import java.util.Vector;
 import javax.swing.JPanel;
-import org.jfree.data.xy.XYSeries;
+//import org.jfree.data.xy.XYSeries;
 
 /**
  *
@@ -107,7 +107,7 @@ public class DrawPanel extends javax.swing.JPanel {
            g2d.drawLine(tempprepoint.x, tempprepoint.y, temppostpoint.x, temppostpoint.y);
        }
     }
-    
+  /*  
     public XYSeries getRCenter(){
         double h = 0;
          double d = 0;
@@ -223,7 +223,7 @@ public class DrawPanel extends javax.swing.JPanel {
         }
         return rtotal;
     }
-    
+    */
     public void setTime(int _time){
         time = _time;
     }
