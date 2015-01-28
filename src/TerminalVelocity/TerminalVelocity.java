@@ -480,6 +480,7 @@ public class TerminalVelocity extends javax.swing.JApplet {
         DistanceLabel = new javax.swing.JLabel();
 
         setMinimumSize(new java.awt.Dimension(400, 419));
+        setPreferredSize(new java.awt.Dimension(800, 600));
 
         jInternalFrame1.setResizable(true);
         jInternalFrame1.setMinimumSize(new java.awt.Dimension(400, 415));
@@ -497,7 +498,7 @@ public class TerminalVelocity extends javax.swing.JApplet {
         );
         DrawPanelLayout.setVerticalGroup(
             DrawPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 227, Short.MAX_VALUE)
+            .addGap(0, 230, Short.MAX_VALUE)
         );
 
         ChartPanel.setBackground(new java.awt.Color(255, 255, 255));
@@ -510,7 +511,7 @@ public class TerminalVelocity extends javax.swing.JApplet {
         );
         ChartPanelLayout.setVerticalGroup(
             ChartPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 153, Short.MAX_VALUE)
+            .addGap(0, 154, Short.MAX_VALUE)
         );
 
         PlateButton.setText("1kg l=30cm iorn plate");
@@ -587,7 +588,7 @@ public class TerminalVelocity extends javax.swing.JApplet {
             .addGroup(jInternalFrame1Layout.createSequentialGroup()
                 .addGroup(jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jInternalFrame1Layout.createSequentialGroup()
-                        .addComponent(DrawPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 227, Short.MAX_VALUE)
+                        .addComponent(DrawPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 230, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED))
                     .addGroup(jInternalFrame1Layout.createSequentialGroup()
                         .addGap(40, 40, 40)
