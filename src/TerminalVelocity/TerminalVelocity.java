@@ -72,7 +72,7 @@ public class TerminalVelocity extends javax.swing.JApplet {
     XYSeriesCollection data1 = new XYSeriesCollection();
     XYSeriesCollection data1v1 = new XYSeriesCollection();
     XYSeriesCollection data1v2 = new XYSeriesCollection();
-    JFreeChart chart = ChartFactory.createXYLineChart("Terminal Velocity","sec","Velocity[m/s]",data1,PlotOrientation.VERTICAL,true,true,false);
+    JFreeChart chart = ChartFactory.createXYLineChart("","Time[s]","Velocity[m/s]",data1,PlotOrientation.VERTICAL,true,true,false);
     XYPlot plot = new XYPlot();
     XYLineAndShapeRenderer render1 = new XYLineAndShapeRenderer();
     XYLineAndShapeRenderer render2 = new XYLineAndShapeRenderer();
@@ -383,7 +383,7 @@ public class TerminalVelocity extends javax.swing.JApplet {
         plot.setRenderer(2,render3);
         plot.setRenderer(0,render1);
         plot.setRenderer(1,render2);
-        chart.setTitle("Terminal Velocity"); // 차트 타이틀
+        //chart.setTitle("Terminal Velocity"); // 차트 타이틀
         chart.plotChanged(new PlotChangeEvent(plot));
 //        System.out.println(v1.getItemCount());
         return chart;
